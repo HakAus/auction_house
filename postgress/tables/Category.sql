@@ -1,0 +1,6 @@
+CREATE TABLE Category
+(
+    Id SERIAL NOT NULL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Description TEXT NOT NULL
+);
