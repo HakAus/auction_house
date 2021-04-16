@@ -1,8 +1,8 @@
 
-CREATE TABLE Tipos (
+CREATE TABLE TiposUsuarios (
     IdTipo INT CONSTRAINT tipos_pk PRIMARY KEY,
     Nombre VARCHAR(50) NOT NULL
-);
+); -- le cambie el nombre
 
 CREATE TABLE Usuarios(
     Cedula INT CONSTRAINT usario_pk PRIMARY KEY,
@@ -18,12 +18,12 @@ CREATE TABLE Usuarios(
 
 CREATE TABLE Telefonos(
     IdTelefono int CONSTRAINT telefono_pk PRIMARY KEY,
-    IdParticipante INT NOT NULL REFERENCES Usuarios(Cedula),
-    Telefono VARCHAR(20) NOT NULL
+    IdUsuario INT NOT NULL REFERENCES Usuarios(Cedula), -- le cambie el nombre (15/04/2021)
+    Telefono VARCHAR(20) NOT NULL -- por qué no un INT?
 );
 
 CREATE TABLE HistorialVentas(
-    IdHistorial INT CONSTRAINT historialventas_pk PRIMARY KEY,
+    IdVenta INT CONSTRAINT historialventas_pk PRIMARY KEY,  -- cambie el nombre
     IdSubasta INT NOT NULL REFERENCES Subastas(IdSubasta),
     IdComprador INT NOT NULL REFERENCES Usuarios(Cedula)
 );
