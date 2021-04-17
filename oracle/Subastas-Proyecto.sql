@@ -4,6 +4,12 @@ CREATE TABLE Tipos (
     Nombre VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE Administradores(
+    idno NUMBER(2) CONSTRAINT admin_pk PRIMARY KEY,
+    nombre VARCHAR2(20 CHAR),
+    contrasena VARCHAR2(20 CHAR)
+);
+
 CREATE TABLE Usuarios(
     Cedula INT CONSTRAINT usario_pk PRIMARY KEY,
     IdTipo INT NOT NULL REFERENCES Tipos(IdTipo),

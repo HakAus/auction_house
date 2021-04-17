@@ -16,7 +16,12 @@ async function init() {
 	app.get('/', (req, res) => {
 	  res.send('go to Usuarios en base de datos');
 	})
-
+	app.get('/Test', (req, res) => {
+	  test();
+	})
+	app.get('/RegistrarAdmin',(req,res) =>{
+		registerNewAdmin(req,res);
+	})
 	app.get('/Usuarios', (req, res) => {
 		getUsers(req, res);
 	})
@@ -52,6 +57,59 @@ async function getUsers(req, res) {
       }
     }
   }
+}
+
+async function test(req,res){
+  let connection;
+  try {
+    // Get a connection from the default pool
+    console.log("TEST");
+    connection = await oracledb.getConnection();
+    const sql = "INSERT INTO Administradores VALUES(:idno,:nombre,:contrasena)";
+    const result = await connection.execute(sql,{
+	        idno: 1,  // Bind type is determined from the data.  Default direction is BIND_IN
+	        nombre:'Fernan',
+	        contrasena:'Bomboclak'
+      	},{ autoCommit: true });
+    // oracledb.getPool()._logStats(); // show pool statistics.  _enableStats must be true
+  } catch (err) {
+    console.log(err);
+  } finally {
+    if (connection) {
+      try {
+        // Put the connection back in the pool
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+}
+
+async function registerNewAdmin(req,res){
+	let connection;
+	try{
+		console.log("Trying to registerNewAdmin");
+		connection = await oracledb.getConnection();
+		const sql = 'BEGIN REGISTER_NEW_ADMIN(:idno,:nombre,:contrasena); END;'
+		const result = await connection.execute(sql,{
+	        idno: 1,  // Bind type is determined from the data.  Default direction is BIND_IN
+	        nombre:'Fernan',
+	        contrasena:'Bomboclak'
+      	}
+      );
+		res.send(result);
+	}catch(err){
+		console.error(err);
+	}finally{
+		if(connection){
+			try{
+				await connection.close();
+			}catch(err){
+				console.error(err);
+			}
+		}
+	}
 }
 
 

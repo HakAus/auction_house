@@ -1,0 +1,4 @@
+CREATE OR REPLACE PROCEDURE PUSH_AUCT_LIST (pIdSubasta NUMBER)AS 
+BEGIN
+    SELECT * FROM Ofertas WHERE idSubasta = pIdSubasta ORDER BY fechaTiempo DESC;
+END;

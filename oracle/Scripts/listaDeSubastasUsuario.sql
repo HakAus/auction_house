@@ -1,0 +1,4 @@
+CREATE OR REPLACE PROCEDURE AUCT_USER_LIST(pIdVendedor NUMBER) AS
+BEGIN
+    SELECT * FROM Subastas WHERE idvendedor = pIdVendedor ORDER BY fechahoracierre DESC;
+END;
