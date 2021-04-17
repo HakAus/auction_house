@@ -1,20 +1,16 @@
-CREATE PROCEDURE FIND_ITEM (pIdItem NUMBER) AS --RETORNAR EL PRODUCTO? O VALIDAR CONTRA LA BASE
-BEGIN
-    SELECT idItem FROM Items WHERE idItem = pIdItem;
-END;
 
-CREATE PROCEDURE FIND_AUCT (pIdItem NUMBER) AS --RETORNAR EL PRODUCTO? O VALIDAR CONTRA LA BASE
+CREATE OR REPLACE PROCEDURE AUCT_ITEM(IdSubasta NUMBER,IdItemSubastado NUMBER,IdVendedor NUMBER,FechaHoraCierre TIMESTAMP,DetallesDeEntrega VARCHAR2,pIdItem NUMBER,pIdSubcategoria NUMBER,pPrecioBase NUMBER,pDescripcion VARCHAR2,pImagen BLOB) AS 
+CURSOR search_item IS
+SELECT idItem FROM Items WHERE idItem = pIdItem;
+CURSOR search_subasta IS
+SELECT idItem FROM Items WHERE idItem = pIdItem;
 BEGIN
-    SELECT idItem FROM Items WHERE idItem = pIdItem;
-END;
-
-
-CREATE PROCEDURE CREATE_ITEM(pIdItem NUMBER,pIdSubcategoria NUMBER,pPrecioBase NUMBER,pDescripcion VARCHAR2,pImagen BLOB) AS
-BEGIN
-    INSERT INTO Items(pIdItem,pIdSubcategoria,pPrecioBase,pDescripcion,pImagen);
-END;
-
-CREATE PROCEDURE AUCT_ITEM(IdSubasta NUMBER,IdItemSubastado NUMBER,IdVendedor NUMBER,FechaHoraCierre TIMESTAMP,DetallesDeEntrega VARCHAR2) AS --vOY A DEJAR QUE SE LE PONGA UN NUMERO O LO SUMO CON UN CONSECUTIVO?
-BEGIN
-    INSERT INTO Subastas(IdSubasta,IdItemSubastado,IdVendedor,FechaHoraCierre,DetallesDeEntrega);
+    OPEN search_Item;    
+    IF search_Item%NOTFOUND THEN
+        INSERT INTO Items VALUES(pIdItem,pIdSubcategoria,pPrecioBase,pDescripcion,pImagen);
+        OPEN search_subasta;
+        IF search_subasta%NOTFOUND THEN
+            INSERT INTO Subastas VALUES(IdSubasta,IdItemSubastado,IdVendedor,FechaHoraCierre,DetallesDeEntrega);
+        END IF;
+    END IF;
 END;
