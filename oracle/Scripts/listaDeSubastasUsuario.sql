@@ -1,4 +1,9 @@
-CREATE OR REPLACE PROCEDURE AUCT_USER_LIST(pIdVendedor NUMBER) AS
+CREATE OR REPLACE FUNCTION AUCT_USER_LIST(pIdVendedor NUMBER)RETURN SYS_REFCURSOR AS
+    lista_subastas SYS_REFCURSOR;
 BEGIN
-    SELECT * FROM Subastas WHERE idvendedor = pIdVendedor ORDER BY fechahoracierre DESC;
+    OPEN lista_subastas FOR
+    SELECT * FROM Subastas
+    WHERE idVendedor = pIdVendedor
+    ORDER BY fechaHoraCierre DESC;
+    RETURN lista_subastas;
 END;
