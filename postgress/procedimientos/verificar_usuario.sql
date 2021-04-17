@@ -16,9 +16,9 @@ constraint_text TEXT;
 BEGIN
 
     SELECT Cedula INTO cedula_validada
-    FROM Usuarios
+    FROM Usuarios U
     INNER JOIN TiposUsuarios TU ON TU.Nombre = _tipo_usuario
-    WHERE Alias = _alias AND Contrasena = _contrasena;
+    WHERE U.Alias = _alias AND U.Contrasena = _contrasena AND TU.IdTipo = U.IdTipo;
     
     IF cedula_validada <> 0 THEN
         RETURN QUERY SELECT cedula_validada, 1;

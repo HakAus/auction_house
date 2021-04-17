@@ -28,12 +28,14 @@ const registerErrorHandler = (state, response) => {
   }
 };
 const loginErrorHandler = (state, response) => {
-  if (state === -1)
+  if (state === -1) {
+    console.log("Usuario inváldio");
     return response
       .status(401)
       .send(
         "Usuario inválido. Acceso denegado. Verifique que haya escrito bien el alias y la contraseña"
       );
+  }
 };
 
 // Registro
@@ -94,6 +96,8 @@ router.post("/login", validInfo, async (req, res) => {
   try {
     // 1. Desestrcuturar req.body (alias, contraseña)
     const { alias, contrasena, tipo_usuario } = req.body;
+
+    console.log("INFORMACION PARA LOGIN", alias, contrasena, tipo_usuario);
 
     // 2. Se ejecuta el procedimiento de login
     const queryText = "SELECT * FROM verificar_usuario($1, $2, $3)";

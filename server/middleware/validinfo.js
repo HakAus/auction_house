@@ -87,6 +87,5 @@ module.exports = function (req, res, next) {
     }
   }
 
-  console.log("Validación exitosa");
   next(); // para seguir con el siguiente middleware del pipeline
 };

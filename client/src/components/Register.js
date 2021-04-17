@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
+import { Link } from "react-router-dom";
 
-const Register = () => {
+const Register = ({ setAuth }) => {
   const [inputs, setInputs] = useState({
     cedula: "",
     tipo_usuario: "administrador",
@@ -51,14 +52,18 @@ const Register = () => {
 
       const parseResponse = await response.json();
 
-      console.log(parseResponse);
+      // Se guarda el token del usuario
+      localStorage.setItem("token", parseResponse.token);
+      // Se valida el acceso
+      setAuth(true);
     } catch (err) {
       console.error(err.message);
     }
   };
+
   return (
     <Fragment>
-      <h1 className="text-center my-5">Register</h1>
+      <h1 className="text-center my-5">Registro de usuario</h1>
       <form onSubmit={onSubmitForm}>
         <input
           type="text"
@@ -151,6 +156,7 @@ const Register = () => {
         />
         <button className="btn btn-success btn-block">Registrar</button>
       </form>
+      <Link to="/login">Iniciar sesión</Link>
     </Fragment>
   );
 };
