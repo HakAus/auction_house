@@ -26,6 +26,15 @@ const registerErrorHandler = (state, response) => {
   }
 };
 
+const loginErrorHandler = (state, response) => {
+  if (state === -1)
+    return response
+      .status(401)
+      .send(
+        "Usuario inválido. Acceso denegado. Verifique que haya escrito bien el alias y la contraseña"
+      );
+};
+
 router.post("/register", async (req, res) => {
   const user = await pool.connect();
   try {
@@ -59,19 +68,54 @@ router.post("/register", async (req, res) => {
       correo,
       estado,
     ]);
+    console.log(procedure.rows[0]._estado);
     // 2. Verificar si existe el usuario (si no, mandar error)
-    if (procedure.rows._estado != 1) {
+    if (procedure.rows._estado !== 1) {
       registerErrorHandler(procedure.rows[0]._estado, res);
     }
     // 3. Generar el token jwt
     const token = jwtGenerator(cedula);
-    res.json({ token }); // Envia una respuesta en formato JSON
+    // Enviar el token como respuesta en formato JSON
+    res.json({ token });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   } finally {
     // Debe liberarse el cliente para que pueda ser usado en una futura transacción.
     user.release();
+  }
+});
+
+// Login
+
+router.post("/login", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    // 1. Desestrcuturar req.body (alias, contraseña)
+    const { alias, contrasena, tipo_usuario } = req.body;
+
+    // 2. Se ejecuta el procedimiento de login
+    const queryText = "SELECT * FROM verificar_usuario($1, $2, $3)";
+    const procedure = await client.query(queryText, [
+      alias,
+      contrasena,
+      tipo_usuario,
+    ]);
+
+    console.log(procedure.rows[0]._estado);
+    if (procedure.rows[0]._estado !== 1) {
+      loginErrorHandler(procedure.rows[0]._estado, res);
+    }
+
+    // 3. Generar el token
+    const token = jwtGenerator(procedure.rows[0]._cedula);
+    // Se envía el token como respuesta en formato JSON
+    res.json({ token });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
+  } finally {
+    client.release();
   }
 });
 

@@ -1,4 +1,5 @@
--- Funcion que retorna la cedula y alias si existe el usuario con las credenciales indicadas.
+-- Procedimiento que registra a un nuevo usuario. Retorna una variable _estado con 1 si es exitoso o un código de error si no.
+
 CREATE OR REPLACE PROCEDURE registrar_usuario
 (
     IN _cedula INT,
