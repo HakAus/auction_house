@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const pool = require("../database");
 const jwtGenerator = require("../utils/jwtGenerator");
+const validInfo = require("../middleware/validinfo");
+const authorization = require("../middleware/authorization");
 
-// Registro
+// Error handling
 const registerErrorHandler = (state, response) => {
   switch (state) {
     case -1:
@@ -25,7 +27,6 @@ const registerErrorHandler = (state, response) => {
       break;
   }
 };
-
 const loginErrorHandler = (state, response) => {
   if (state === -1)
     return response
@@ -35,7 +36,8 @@ const loginErrorHandler = (state, response) => {
       );
 };
 
-router.post("/register", async (req, res) => {
+// Registro
+router.post("/register", validInfo, async (req, res) => {
   const user = await pool.connect();
   try {
     // 1. Desestrcuturar req.body (alias, contraseña)
@@ -68,15 +70,16 @@ router.post("/register", async (req, res) => {
       correo,
       estado,
     ]);
-    console.log(procedure.rows[0]._estado);
+
     // 2. Verificar si existe el usuario (si no, mandar error)
     if (procedure.rows._estado !== 1) {
       registerErrorHandler(procedure.rows[0]._estado, res);
+    } else {
+      // 3. Generar el token jwt
+      const token = jwtGenerator(cedula);
+      // Enviar el token como respuesta en formato JSON
+      res.json({ token });
     }
-    // 3. Generar el token jwt
-    const token = jwtGenerator(cedula);
-    // Enviar el token como respuesta en formato JSON
-    res.json({ token });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
@@ -87,8 +90,7 @@ router.post("/register", async (req, res) => {
 });
 
 // Login
-
-router.post("/login", async (req, res) => {
+router.post("/login", validInfo, async (req, res) => {
   const client = await pool.connect();
   try {
     // 1. Desestrcuturar req.body (alias, contraseña)
@@ -102,20 +104,28 @@ router.post("/login", async (req, res) => {
       tipo_usuario,
     ]);
 
-    console.log(procedure.rows[0]._estado);
     if (procedure.rows[0]._estado !== 1) {
       loginErrorHandler(procedure.rows[0]._estado, res);
+    } else {
+      // 3. Generar el token
+      const token = jwtGenerator(procedure.rows[0]._cedula);
+      // Se envía el token como respuesta en formato JSON
+      res.json({ token });
     }
-
-    // 3. Generar el token
-    const token = jwtGenerator(procedure.rows[0]._cedula);
-    // Se envía el token como respuesta en formato JSON
-    res.json({ token });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   } finally {
     client.release();
+  }
+});
+
+router.get("/is-verified", authorization, async (req, res) => {
+  try {
+    res.json(true);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
   }
 });
 
