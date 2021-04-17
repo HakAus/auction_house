@@ -1,24 +1,26 @@
 const router = require("express").Router();
 const pool = require("../database");
+const jwtGenerator = require("../utils/jwtGenerator");
 
 // Registro
 const registerErrorHandler = (state, response) => {
   switch (state) {
     case -1:
-      console.log("El tipo de usuario no existe");
-      break;
+      return response.status(409).send("El tipo de usuario no existe");
     case -2:
-      console.log("La cedula ingresada ya existe");
       return response.status(401).send("El usuario ya existe");
     case -3:
-      console.log("Verifique la longitud de los datos ingresados");
-      break;
+      return response
+        .status(409)
+        .send("Verifique la longitud de los datos ingresados");
     case -4:
-      console.log("Verifique el formato del alias ingresado");
-      break;
+      return response
+        .status(409)
+        .send("Verifique el formato del alias ingresado");
     case -5:
-      console.log("Verifique el formato de la contraseña ingresada");
-      break;
+      return response
+        .status(409)
+        .send("Verifique el formato de la contraseña ingresada");
     default:
       break;
   }
@@ -58,16 +60,15 @@ router.post("/register", async (req, res) => {
       estado,
     ]);
     // 2. Verificar si existe el usuario (si no, mandar error)
-    if (procedure.rows._estado == 1) {
-      console.log("todo good");
-    } else {
+    if (procedure.rows._estado != 1) {
       registerErrorHandler(procedure.rows[0]._estado, res);
     }
-    // 3. Ingresar al nuevo usuario en la base de datos
-    // 4. Generar el token jwt
-  } catch (e) {
-    console.log("El registro falló");
-    throw e;
+    // 3. Generar el token jwt
+    const token = jwtGenerator(cedula);
+    res.json({ token }); // Envia una respuesta en formato JSON
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
   } finally {
     // Debe liberarse el cliente para que pueda ser usado en una futura transacción.
     user.release();
