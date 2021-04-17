@@ -54,7 +54,6 @@ router.post("/register", validInfo, async (req, res) => {
       estado,
     } = req.body;
 
-    console.log(req.body);
     // 2. Se hace el registro del usuario en la base de datos por medio de una tranasacción.
     const queryText =
       "CALL registrar_usuario($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
@@ -72,7 +71,7 @@ router.post("/register", validInfo, async (req, res) => {
     ]);
 
     // 2. Verificar si existe el usuario (si no, mandar error)
-    if (procedure.rows._estado !== 1) {
+    if (procedure.rows[0]._estado !== 1) {
       registerErrorHandler(procedure.rows[0]._estado, res);
     } else {
       // 3. Generar el token jwt

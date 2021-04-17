@@ -33,7 +33,6 @@ module.exports = function (req, res, next) {
       direccion,
       correo,
     } = req.body;
-    console.log(!contrasena.length);
     if (
       ![
         cedula,
@@ -79,7 +78,6 @@ module.exports = function (req, res, next) {
     }
   } else if (req.path === "/login") {
     const { alias, contrasena, tipo_usuario } = req.body;
-    console.log(!contrasena.length);
     if (![alias, tipo_usuario, contrasena].every(Boolean)) {
       return res.json("Datos incompletos");
     } else if (!validAlias(alias)) {
@@ -89,5 +87,6 @@ module.exports = function (req, res, next) {
     }
   }
 
+  console.log("Validación exitosa");
   next(); // para seguir con el siguiente middleware del pipeline
 };
