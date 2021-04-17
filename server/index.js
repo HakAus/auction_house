@@ -7,10 +7,13 @@ const cors = require("cors");
 /* Permite acceder a datos obtenidos desde el frontend,
  en particular req.body */
 app.use(express.json());
-// Permite al backend interactuar con el frontend
+/* Permite al backend interactuar con el frontend */
 app.use(cors());
 
 // RUTAS DE LA API //
+
+/* Rutas para inicio de sesion y registro */
+app.use("/auth", require("./routes/jwtAuth"));
 
 // Inicia el servidor en el localhost y el puerto dado
 app.listen(5000, () => {
