@@ -1,6 +1,6 @@
 CREATE TABLE Telefonos
 (
-    IdTelefono INT NOT NULL PRIMARY KEY,
+    IdTelefono SERIAL NOT NULL PRIMARY KEY,
     IdUsuario INT NOT NULL,
     Telefono INT NOT NULL,
 

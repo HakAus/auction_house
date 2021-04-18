@@ -38,6 +38,7 @@ const Login = ({ setAuth }) => {
       console.error(err.message);
     }
   };
+
   return (
     <Fragment>
       <h1 className="text-center my-5">Inicio de sesión</h1>

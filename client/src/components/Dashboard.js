@@ -25,6 +25,7 @@ const Dashboard = ({ setAuth }) => {
     // Se actualiza la autorización a falso.
     setAuth(false);
   };
+
   useEffect(() => {
     getAlias();
   }, []);

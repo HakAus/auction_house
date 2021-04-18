@@ -14,6 +14,8 @@ $$ LANGUAGE plpgsql
     -- Set a secure search_path: trusted schema(s), then 'pg_temp', then pg_catalog to have user-defined names override built-in names
     SET search_path = casa_subastas_schema, pg_temp;
 
+
+
 ALTER FUNCTION autentificar_usuario(varchar,varchar,varchar) SET SCHEMA casa_subastas_schema;
 
 ALTER FUNCTION autentificar_usuario(varchar,varchar,varchar) OWNER TO app;

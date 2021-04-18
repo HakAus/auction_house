@@ -1,6 +1,6 @@
 CREATE TABLE Ofertas
 (
-    Id SERIAL NOT NULL PRIMARY KEY,
+    IdOferta SERIAL NOT NULL PRIMARY KEY,
     IdSubasta INT NOT NULL,
     IdOfertante INT NOT NULL,
     Monto DECIMAL(9,2) NOT NULL,

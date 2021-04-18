@@ -1,10 +1,19 @@
-CREATE PROCEDURE REGISTER_NEW_PARTAKER(cedula NUMBER,idtipo NUMBER,nickname VARCHAR2,contrasena VARCHAR2,nombre VARCHAR2,primerApellido VARCHAR2,segundoApellido VARCHAR2,direccion VARCHAR2, correo VARCHAR2) AS
+CREATE OR REPLACE PROCEDURE registrar_usuario(p_cedula IN INT, p_tipo_usuario IN VARCHAR2, p_alias IN VARCHAR2, p_contrasena IN VARCHAR2, p_nombre IN VARCHAR2, p_primer_apellido IN VARCHAR2, p_segundo_apellido IN VARCHAR2, p_direccion IN VARCHAR2, p_correo IN VARCHAR2, p_estado OUT INT)
+AS
+idTipo INT;
 BEGIN
-    INSERT INTO Usuarios VALUES(cedula,idtipo,nickname,contrasena,nombre,primerApellido,segundoapellido,direccion,correo);
+
+    SELECT TU.IdTipo INTO idTipo 
+    FROM TiposUsuarios TU 
+    WHERE Tu.Nombre = p_tipo_usuario;
+
+    INSERT INTO Usuarios VALUES(p_cedula,idTipo,p_alias,p_contrasena,p_nombre,p_primer_apellido,p_segundo_apellido,p_direccion,p_correo);
+
+    p_estado := 1;
 END;
 
 BEGIN
-    REGISTER_NEW_PARTAKER(3,1,'blop','aans','Hans','Bleki','Bimbo','RUSIA','xd@hotmail.com');
+    registrar_usuario(901110498,'administrador','HakAus','1234qwer','Austin','Hakanson','Hidalgo','Guanacaste','austin@gmail.com',0);
 END;
 
 SELECT * FROM Usuarios

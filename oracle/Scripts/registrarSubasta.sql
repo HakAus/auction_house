@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE PROCEDURE AUCT_ITEM(pIdSubasta NUMBER,IdItemSubastado NUMBER,IdVendedor NUMBER,FechaHoraCierre TIMESTAMP,DetallesDeEntrega VARCHAR2,pIdItem NUMBER,pIdSubcategoria NUMBER,pPrecioBase NUMBER,pDescripcion VARCHAR2,pImagen BLOB) AS 
+CREATE OR REPLACE PROCEDURE registrar_subasta(IdItemSubastado NUMBER,IdVendedor NUMBER,FechaHoraCierre TIMESTAMP,DetallesDeEntrega VARCHAR2,pIdItem NUMBER,pIdSubcategoria NUMBER,pPrecioBase NUMBER,pDescripcion VARCHAR2,pImagen BLOB) AS 
 itemsEncontrados Items%ROWTYPE;
 subastasEncontradas Subastas%ROWTYPE;
 BEGIN

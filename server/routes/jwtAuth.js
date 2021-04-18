@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const pool = require("../database");
+const pg_pool = require("../pg_database");
+const { connectDatabase, registerUser } = require("../database");
 const jwtGenerator = require("../utils/jwtGenerator");
 const validInfo = require("../middleware/validinfo");
 const authorization = require("../middleware/authorization");
@@ -40,7 +41,7 @@ const loginErrorHandler = (state, response) => {
 
 // Registro
 router.post("/register", validInfo, async (req, res) => {
-  const user = await pool.connect();
+  const user = await pg_pool.connect();
   try {
     // 1. Desestrcuturar req.body (alias, contraseña)
     const {
@@ -57,9 +58,9 @@ router.post("/register", validInfo, async (req, res) => {
     } = req.body;
 
     // 2. Se hace el registro del usuario en la base de datos por medio de una tranasacción.
-    const queryText =
-      "CALL registrar_usuario($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
-    const procedure = await user.query(queryText, [
+    // connectDatabase("pg");
+    const procedure_status = registerUser(
+      "oracle",
       cedula,
       tipo_usuario,
       alias,
@@ -69,12 +70,26 @@ router.post("/register", validInfo, async (req, res) => {
       segundo_apellido,
       direccion,
       correo,
-      estado,
-    ]);
+      estado
+    );
+    // const queryText =
+    //   "CALL registrar_usuario($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
+    // const procedure = await user.query(queryText, [
+    //   cedula,
+    //   tipo_usuario,
+    //   alias,
+    //   contrasena,
+    //   nombre,
+    //   primer_apellido,
+    //   segundo_apellido,
+    //   direccion,
+    //   correo,
+    //   estado,
+    // ]);
 
     // 2. Verificar si existe el usuario (si no, mandar error)
-    if (procedure.rows[0]._estado !== 1) {
-      registerErrorHandler(procedure.rows[0]._estado, res);
+    if (procedure_status /*procedure.rows[0]._estado*/ !== 1) {
+      registerErrorHandler(procedure_status, res);
     } else {
       // 3. Generar el token jwt
       const token = jwtGenerator(cedula);
@@ -92,12 +107,10 @@ router.post("/register", validInfo, async (req, res) => {
 
 // Login
 router.post("/login", validInfo, async (req, res) => {
-  const client = await pool.connect();
+  const client = await pg_pool.connect();
   try {
     // 1. Desestrcuturar req.body (alias, contraseña)
     const { alias, contrasena, tipo_usuario } = req.body;
-
-    console.log("INFORMACION PARA LOGIN", alias, contrasena, tipo_usuario);
 
     // 2. Se ejecuta el procedimiento de login
     const queryText = "SELECT * FROM verificar_usuario($1, $2, $3)";
