@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE registrar_usuario(p_cedula IN INT, p_tipo_usuario IN VARCHAR2, p_alias IN VARCHAR2, p_contrasena IN VARCHAR2, p_nombre IN VARCHAR2, p_primer_apellido IN VARCHAR2, p_segundo_apellido IN VARCHAR2, p_direccion IN VARCHAR2, p_correo IN VARCHAR2, p_estado OUT INT)
+CREATE OR REPLACE PROCEDURE casa_subastas.registrar_usuario(p_cedula IN INT, p_tipo_usuario IN VARCHAR2, p_alias IN VARCHAR2, p_contrasena IN VARCHAR2, p_nombre IN VARCHAR2, p_primer_apellido IN VARCHAR2, p_segundo_apellido IN VARCHAR2, p_direccion IN VARCHAR2, p_correo IN VARCHAR2, p_estado OUT INT)
 AS
 idTipo INT;
 BEGIN

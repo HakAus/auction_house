@@ -75,6 +75,7 @@ router.post("/register", validInfo, async (req, res) => {
 
     // 2. Verificar si existe el usuario (si no, mandar error)
     if (procedure_status === 1) {
+      console.log("Registro existoso");
       // 3. Generar el token jwt
       const token = jwtGenerator(cedula);
       // Enviar el token como respuesta en formato JSON

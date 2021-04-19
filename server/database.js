@@ -21,8 +21,9 @@ const registerUser = async (
   const pgQuery =
     "CALL registrar_usuario($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
   const oracleQuery = `BEGIN
-                            registrar_usuario(:p_cedula, :p_tipo_usuario, :p_alias, :p_contrasena, :p_nombre, :p_primer_apellido, :p_segundo_apellido, :p_direccion, :p_correo, :p_estado);
+                            casa_subastas.registrar_usuario(:p_cedula, :p_tipo_usuario, :p_alias, :p_contrasena, :p_nombre, :p_primer_apellido, :p_segundo_apellido, :p_direccion, :p_correo, :p_estado);
                        END;`;
+  // const test = "SELECT * FROM casa_subastas.usuarios";
   let result;
   let client;
 
@@ -61,7 +62,7 @@ const registerUser = async (
         { autoCommit: true }
       );
     }
-
+    // console.log(result);
     // Se retorna el estado del procedimiento
     return database === "pg"
       ? result.rows[0].p_estado
