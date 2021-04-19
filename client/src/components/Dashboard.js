@@ -17,7 +17,7 @@ const Dashboard = ({ setAuth }) => {
 
   async function getAlias() {
     try {
-      const response = await fetch("http://localhost:5000/dashboard/", {
+      const response = await fetch("http://localhost:5000/dashboard", {
         method: "GET",
         headers: { token: localStorage.token },
       });
@@ -26,6 +26,27 @@ const Dashboard = ({ setAuth }) => {
       setAlias(parseResponse.alias);
     } catch (err) {
       console.error(err.message);
+    }
+  }
+
+  async function getProducts(variables){
+
+    try {
+      const response = await fetch("http://localhost:5000/dashboard", {
+        method: "POST",
+        headers: { token: localStorage.token },
+      });
+
+      const parseResponse = await response.json();
+      if (variables.loadMore) {
+        setProducts([...Products, ...response.data.products])
+      } else {
+          setProducts(response.data.products)
+      }
+      setPostSize(response.data.postSize)
+    } catch (err) {
+      console.error(err.message);
+      //Alert('Failed')
     }
   }
   
@@ -40,6 +61,7 @@ const Dashboard = ({ setAuth }) => {
   };
   useEffect(() => {
     getAlias();
+    getProducts();
   }, []);
 
   const [Products, setProducts] = useState([])
@@ -64,10 +86,6 @@ useEffect(() => {
 }, [])
 
 
-
-const getProducts = (variables) => {
-  /*base*/
-}
 
 const onLoadMore = () => {
   let skip = Skip + Limit;
