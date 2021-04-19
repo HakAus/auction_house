@@ -106,7 +106,6 @@ GRANT create any trigger TO casa_subastas;
 GRANT create any procedure TO casa_subastas;
 GRANT create sequence TO casa_subastas;
 GRANT create synonym TO casa_subastas;
-GRANT insert table to casa_subastas;
 
 
 

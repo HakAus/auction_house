@@ -60,7 +60,7 @@ router.post("/register", validInfo, async (req, res) => {
     // 2. Se hace el registro del usuario en la base de datos por medio de una tranasacción.
 
     const procedure_status = await registerUser(
-      /*base_de_datos,*/ "oracle",
+      /*base_de_datos,*/ "pg",
       cedula,
       tipo_usuario,
       alias,

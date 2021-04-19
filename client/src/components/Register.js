@@ -9,7 +9,7 @@ const Register = ({ setAuth }) => {
     contrasena: "",
     nombre: "",
     primer_apellido: "",
-    segundo_apellido: "",
+    segundo_apellido: "", 
     direccion: "",
     correo: "",
   });

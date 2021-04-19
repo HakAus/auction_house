@@ -1,5 +1,6 @@
 import { Fragment, useState, useEffect } from "react";
 import "./App.css";
+import "antd/dist/antd.css";
 
 import {
   BrowserRouter as Router,
@@ -12,6 +13,7 @@ import {
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import UploadItem from "./components/UploadItem";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -79,6 +81,10 @@ function App() {
                   )
                 }
               ></Route>
+              <Route exact path ="/uploadSubasta" render={(props) =>
+                <UploadItem {...props}/>
+                  }>
+              </Route>
             </Switch>
           </div>
         </Router>
