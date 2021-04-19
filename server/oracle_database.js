@@ -1,15 +1,16 @@
 const oracledb = require("oracledb");
 
-module.exports = async function () {
+const connectOracleDatabase = async function () {
   try {
     await oracledb.createPool({
       user: "system",
       password: "admin",
-      connectString: "localhost/auction_house",
+      connectString: "localhost/auction_pdb",
     });
-    // oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-    return oracledb;
+    // (DESCRIPTION =(ADDRESS = (PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA = (SERVER = DEDICATED)(SID=auction)))
   } catch (err) {
     console.error(err.message);
   }
 };
+
+module.exports = connectOracleDatabase;

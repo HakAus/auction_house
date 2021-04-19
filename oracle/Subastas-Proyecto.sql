@@ -1,7 +1,13 @@
-
+-- Creacion de base de datos
 CREATE TABLE TiposUsuarios (
-    IdTipo GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IdTipo INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Nombre VARCHAR2(50) NOT NULL
+);
+
+CREATE TABLE Telefonos(
+    IdTelefono INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IdUsuario INT NOT NULL REFERENCES Usuarios(Cedula),
+    Telefono INT NOT NULL -- por qué no un INT?
 );
 
 CREATE TABLE Usuarios(
@@ -16,10 +22,42 @@ CREATE TABLE Usuarios(
     Correo VARCHAR2(200) NOT NULL
 );
 
-CREATE TABLE Telefonos(
-    IdTelefono INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    IdUsuario INT NOT NULL REFERENCES Usuarios(Cedula),
-    Telefono INT NOT NULL -- por qué no un INT?
+CREATE TABLE Categorias(
+    IdCategoria INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    Nombre VARCHAR2(100) NOT NULL,
+    Descripcion VARCHAR2(800) NOT NULL
+);
+
+CREATE TABLE Subcategorias(
+    IdSubcategoria INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IdCategoria INT NOT NULL REFERENCES Categorias(IdCategoria),
+    Nombre VARCHAR2(100) NOT NULL,
+    Descripcion VARCHAR2(800) NOT NULL
+);
+
+CREATE TABLE Items(
+    IdItem INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IdSubcategoria INT NOT NULL REFERENCES Subcategorias(IdSubcategoria),
+    PrecioBase DECIMAL(9,2) NOT NULL,
+    Descripcion VARCHAR2(800),
+    Imagen BLOB
+);
+
+CREATE TABLE Subastas(
+    IdSubasta INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IdItemSubastado INT NOT NULL REFERENCES Items(IdItem),
+    IdVendedor INT NOT NULL REFERENCES Usuarios(Cedula),
+    FechaHoraCierre TIMESTAMP  NOT NULL,
+    DetallesDeEntrega VARCHAR2(800) 
+);
+
+CREATE TABLE Ofertas(
+    IdOferta INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IdSubasta INT NOT NULL REFERENCES Subastas(IdSubasta),
+    IdOfertante INT NOT NULL REFERENCES Usuarios(Cedula),
+    Monto DECIMAL(9,2) NOT NULL,
+    FechaTiempo TIMESTAMP  NOT NULL,
+    Ganadora CHAR(1) NOT NULL
 );
 
 CREATE TABLE Ventas(
@@ -43,40 +81,30 @@ CREATE TABLE ComentarioComprador(
     Calificacion NUMBER(1) NOT NULL
 );
 
-CREATE TABLE Subastas(
-    IdSubasta INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    IdItemSubastado INT NOT NULL REFERENCES Items(IdItem),
-    IdVendedor INT NOT NULL REFERENCES Usuarios(Cedula),
-    FechaHoraCierre TIMESTAMP  NOT NULL,
-    DetallesDeEntrega VARCHAR2(800) 
-);
+-- Eliminar tablas
 
-CREATE TABLE Ofertas(
-    IdOferta INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    IdSubasta INT NOT NULL REFERENCES Subastas(IdSubasta),
-    IdOfertante INT NOT NULL REFERENCES Usuarios(Cedula),
-    Monto DECIMAL(9,2) NOT NULL,
-    FechaTiempo TIMESTAMP  NOT NULL,
-    Ganadora CHAR(1) NOT NULL
-);
+DROP TABLE ComentarioComprador;
+DROP TABLE ComentarioVendedor;
+DROP TABLE Ventas;
+DROP TABLE Ofertas;
+DROP TABLE Subastas;
+DROP TABLE Items;
+DROP TABLE Subcategorias;
+DROP TABLE Categorias;
+DROP TABLE Usuarios;
+DROP TABLE Telefonos;
+DROP TABLE TiposUsuarios;
 
-CREATE TABLE Items(
-    IdItem INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    IdSubcategoria INT NOT NULL REFERENCES Subcategorias(IdSubcategoria),
-    PrecioBase DECIMAL(9,2) NOT NULL,
-    Descripcion VARCHAR2(800),
-    Imagen BLOB
-);
+-- Usuarios
+-- Se crea el usuario general (y por defecto el schema del mismo nombre)
+CREATE USER casa_subastas IDENTIFIED BY app123QWE;
+GRANT create session TO casa_subastas;
+GRANT create table TO casa_subastas;
+GRANT create view TO casa_subastas;
+GRANT create any trigger TO casa_subastas;
+GRANT create any procedure TO casa_subastas;
+GRANT create sequence TO casa_subastas;
+GRANT create synonym TO casa_subastas;
 
-CREATE TABLE Categorias(
-    IdCategoria INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    Nombre VARCHAR2(100) NOT NULL,
-    Descripcion VARCHAR2(800) NOT NULL
-);
 
-CREATE TABLE Subcategorias(
-    IdSubcategoria INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    IdCategoria INT NOT NULL REFERENCES Categorias(IdCategoria),
-    Nombre VARCHAR2(100) NOT NULL,
-    Descripcion VARCHAR2(800) NOT NULL
-);
+

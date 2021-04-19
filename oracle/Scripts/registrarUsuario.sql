@@ -12,8 +12,9 @@ BEGIN
     p_estado := 1;
 END;
 
+DECLARE estado INT;
 BEGIN
-    registrar_usuario(901110498,'administrador','HakAus','1234qwer','Austin','Hakanson','Hidalgo','Guanacaste','austin@gmail.com',0);
+    registrar_usuario(901110498,'administrador','HakAus','1234qwer','Austin','Hakanson','Hidalgo','Guanacaste','austin@gmail.com',estado);
 END;
 
 SELECT * FROM Usuarios

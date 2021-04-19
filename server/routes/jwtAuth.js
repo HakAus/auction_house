@@ -41,10 +41,10 @@ const loginErrorHandler = (state, response) => {
 
 // Registro
 router.post("/register", validInfo, async (req, res) => {
-  const user = await pg_pool.connect();
   try {
     // 1. Desestrcuturar req.body (alias, contraseña)
     const {
+      // base_de_datos,
       cedula,
       tipo_usuario,
       alias,
@@ -58,9 +58,9 @@ router.post("/register", validInfo, async (req, res) => {
     } = req.body;
 
     // 2. Se hace el registro del usuario en la base de datos por medio de una tranasacción.
-    // connectDatabase("pg");
-    const procedure_status = registerUser(
-      "oracle",
+
+    const procedure_status = await registerUser(
+      /*base_de_datos,*/ "oracle",
       cedula,
       tipo_usuario,
       alias,
@@ -72,36 +72,19 @@ router.post("/register", validInfo, async (req, res) => {
       correo,
       estado
     );
-    // const queryText =
-    //   "CALL registrar_usuario($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
-    // const procedure = await user.query(queryText, [
-    //   cedula,
-    //   tipo_usuario,
-    //   alias,
-    //   contrasena,
-    //   nombre,
-    //   primer_apellido,
-    //   segundo_apellido,
-    //   direccion,
-    //   correo,
-    //   estado,
-    // ]);
 
     // 2. Verificar si existe el usuario (si no, mandar error)
-    if (procedure_status /*procedure.rows[0]._estado*/ !== 1) {
-      registerErrorHandler(procedure_status, res);
-    } else {
+    if (procedure_status === 1) {
       // 3. Generar el token jwt
       const token = jwtGenerator(cedula);
       // Enviar el token como respuesta en formato JSON
       res.json({ token });
+    } else {
+      registerErrorHandler(procedure_status, res);
     }
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
-  } finally {
-    // Debe liberarse el cliente para que pueda ser usado en una futura transacción.
-    user.release();
   }
 });
 

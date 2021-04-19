@@ -1,6 +1,10 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const connectOracleDatabase = require("./oracle_database");
+
+// Conexión a la base de datos de Oracle
+connectOracleDatabase();
 
 // Midleware: software intermediario para preparacion o manipulación de solicitudes a la API.
 

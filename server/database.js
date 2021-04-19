@@ -1,20 +1,9 @@
 const oracledb = require("oracledb");
 const pg_pool = require("./pg_database");
-// const oracle_pool = require("./oracle_database");
 
-// let client;
-// const connectDatabase = async (database) => {
-//   if (database == "pg") {
-//     console.log("Conectando a postgres");
-//     const cosa = await pg_pool.connect();
-//     console.log();
-//   } else {
-//     const cosa = await oracle_pool.getConnection();
-//   }
-// };
+// Funciones y stored procedures
 
-// Stored procedures and functions
-
+// Registro de usuario
 const registerUser = async (
   database,
   cedula,
@@ -28,25 +17,21 @@ const registerUser = async (
   correo,
   estado
 ) => {
+  // Sentencias de las bases de datos.
   const pgQuery =
     "CALL registrar_usuario($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
   const oracleQuery = `BEGIN
                             registrar_usuario(:p_cedula, :p_tipo_usuario, :p_alias, :p_contrasena, :p_nombre, :p_primer_apellido, :p_segundo_apellido, :p_direccion, :p_correo, :p_estado);
                        END;`;
   let result;
-  const pg_client = await pg_pool.connect();
-  await oracledb.initOracleClient({
-    libDir: "/Users/austinedwardhakansonhidalgo/Downloads/instantclient_19_8",
-  });
-  await oracledb.createPool({
-    user: "system",
-    password: "admin",
-    connectString: "localhost/auction_pdb",
-  });
-  const oracle_client = await oracledb.getConnection();
+  let client;
+
+  // Ejecución de la consulta.
+  if (database === "pg") client = await pg_pool.connect();
+  else client = await oracledb.getConnection();
   try {
     if (database === "pg") {
-      result = await pg_client.query(pgQuery, [
+      result = await client.query(pgQuery, [
         cedula,
         tipo_usuario,
         alias,
@@ -59,32 +44,39 @@ const registerUser = async (
         estado,
       ]);
     } else {
-      result = await oracle_client.execute(oracleQuery, {
-        p_cedula: cedula,
-        p_tipo_usuario: tipo_usuario,
-        p_alias: alias,
-        p_contrasena: contrasena,
-        p_nombre: nombre,
-        p_primer_apellido: primer_apellido,
-        p_segundo_apellido: segundo_apellido,
-        p_direccion: direccion,
-        p_correo: correo,
-        p_estado: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
-      });
+      result = await client.execute(
+        oracleQuery,
+        {
+          p_cedula: cedula,
+          p_tipo_usuario: tipo_usuario,
+          p_alias: alias,
+          p_contrasena: contrasena,
+          p_nombre: nombre,
+          p_primer_apellido: primer_apellido,
+          p_segundo_apellido: segundo_apellido,
+          p_direccion: direccion,
+          p_correo: correo,
+          p_estado: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+        },
+        { autoCommit: true }
+      );
     }
-    console.log(result.outBinds);
-    // console.log("Resultado del registro es: ", result.rows[0].p_estado);
-    return result.outBinds /*result.rows[0].p_estado*/;
+
+    // Se retorna el estado del procedimiento
+    return database === "pg"
+      ? result.rows[0].p_estado
+      : result.outBinds.p_estado;
   } catch (err) {
     console.error(err.message);
   } finally {
+    // Se libera el cliente del pool respectivo
     if (database === "pg") {
       client.release();
     } else {
-      oracle_client.close();
+      client.close();
     }
   }
 };
 
-// module.exports.connectDatabase = connectDatabase;
+// Se exportan las funciones para cada procedimiento o función
 module.exports.registerUser = registerUser;
