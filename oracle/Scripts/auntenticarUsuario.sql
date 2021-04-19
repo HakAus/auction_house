@@ -13,3 +13,8 @@ BEGIN
         WHERE U.Alias = p_alias AND U.Contrasena = p_contrasena;
     RETURN user_info;
 END;
+
+
+BEGIN
+    select * from casa_subastas.autenticar_usuario('HakAus','1234qwer','administrador');
+END;
