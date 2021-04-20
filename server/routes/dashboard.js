@@ -24,11 +24,28 @@ router.post("/",async (req,res) =>{
     const queryText = "SELECT * FROM obtener_subastas()";
     const procedure = await client.query(queryText);
     res.json(procedure.rows)
-    console.log(procedure.rows)
   }catch(err){
     console.error(err.message)
     res.status(500).send("Error en el servidor")
   }
 })
+
+router.post("/verSubastas",authorization,async(req,res)=>{
+  const client = await pool.connect();
+  console.log("Getting bids")
+  try{
+    const { idsubasta } = req.body;
+    console.log("AAAAAAAY"+req.body)
+    const queryText = "SELECT * FROM obtener_pujas_para_subastas(1)";
+    const procedure = await client.query(queryText,[
+      idsubasta
+    ]);
+    res.json(procedure.rows)
+    console.log(procedure.rows)
+  }catch(err){
+    console.error(err.message)
+    res.status(500).send("Error en el servidor")
+  }
+});
 
 module.exports = router;

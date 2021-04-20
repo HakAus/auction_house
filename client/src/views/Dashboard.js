@@ -5,11 +5,20 @@ import NavBar from "../components/NavBar";
 import CategoryView from "./CategoryView";
 import CreateAuctionView from "./CreateAuctionView";
 import RegisterUserView from "./RegisterUserView";
+import AuctHistoryView from "./AuctHistoryView";
 
 const Dashboard = ({ setAuth }) => {
   const [alias, setAlias] = useState("");
   const [userType, setUserType] = useState("");
   const [view, setView] = useState("");
+  const [Subasta,setSubasta] = useState("")
+
+  const getAuctData = (e,Subasta) => {
+    setSubasta(Subasta)
+    console.log("Entra a setear subasta")
+    console.log(Subasta)
+    setView("auct_history")
+  }
 
   async function getUserData() {
     try {
@@ -40,6 +49,7 @@ const Dashboard = ({ setAuth }) => {
     getUserData();
   }, []);
 
+
   return (
     <Fragment>
       <header>
@@ -53,12 +63,17 @@ const Dashboard = ({ setAuth }) => {
       <body>
         <div>
           {view === "category_view" && userType === "participante" ? (
-            <CategoryView />
+            <CategoryView 
+              getAuctData={getAuctData}
+            />
           ) : view === "create_auction_view" && userType === "participante" ? (
             <CreateAuctionView />
           ) : view === "register_user_view" && userType === "administrador" ? (
             <RegisterUserView />
-          ) : (
+          ) : view === "auct_history" && userType === "participante" ?(
+            <AuctHistoryView 
+             Subasta = {Subasta}/>
+          ):(
             <div></div>
           )}
         </div>
