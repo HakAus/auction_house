@@ -28,7 +28,6 @@ const CategoriyView = () => {
     // Se elimina el token asignado.
     localStorage.removeItem("token");
     // Se actualiza la autorización a falso.
-    //setAuth(false);
   };
 
   

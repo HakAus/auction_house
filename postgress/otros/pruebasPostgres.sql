@@ -15,13 +15,16 @@ Insert into subcategorias values (1,1,'Musica Clasica','Es clasica');
 Insert into subcategorias values (2,1,'Musica Electronica','Si');
 Insert into subcategorias values (3,2,'Peliculas de Ciencia Ficcion','EAAAA');
 Insert into subcategorias values (4,3,'Consolas','Pa jugah')
-
-create or replace function get_Items() returnS table(idItem int,idSubcategoria int,preciobase numeric(9,2),descripcion text,imagen bytea)
+--Borrar para hacer el cambio
+DROP FUNCTION get_items();
+--Trae una tabla con informacion general de las subastas. Pienso que es necesario traer la informacion especifica que se va a usar para la vista
+create or replace function get_Items() returnS table(idSubasta int,horaDeCierre timestamp,idItem int,preciobase numeric(9,2),descripcion text,imagen bytea)
 language plpgsql
 as $$
 begin
 return query
-	Select * from Items;
+	SELECT S.idSubasta,S.fechaHoraCierre,I.idItem,I.precioBase,I.descripcion,I.imagen FROM Subastas S
+	INNER JOIN Items I ON I.idItem = iditemsubastado;
 end; $$
  SECURITY DEFINER
     -- Set a secure search_path: trusted schema(s), then 'pg_temp', then pg_catalog to have user-defined names override built-in names
