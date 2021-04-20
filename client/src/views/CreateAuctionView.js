@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import {
   Menu,
   Dropdown,
@@ -12,95 +11,105 @@ import {
 } from "antd";
 import FileUpload from "../components/FileUpload";
 import Icon from "@ant-design/icons";
-
+import moment from "moment";
 const { Title } = Typography;
 const { TextArea } = Input;
 
+// Componentes propios
+
 const CreateAuctionView = (setAuth) => {
   // Hooks
-  const [TitleValue, setTitleValue] = useState("");
-  const [DescriptionValue, setDescriptionValue] = useState("");
-  const [PriceValue, setPriceValue] = useState(0);
-  const [ContinentValue, setContinentValue] = useState(1);
-  const [Images, setImages] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [categoryId, setCategoryId] = useState(0);
+  const [subcategoryId, setSubcategoryId] = useState(0);
+  const [description, setDescription] = useState("");
+  const [basePrice, setBasePrice] = useState(0.0);
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [image, setImage] = useState("");
 
-  const [inputs, setInputs] = useState({
-    cedula: "",
-    tipo_usuario: "administrador",
-    alias: "",
-    contrasena: "",
-    nombre: "",
-    primer_apellido: "",
-    segundo_apellido: "",
-    direccion: "",
-    correo: "",
-  });
+  // Para traer categorias y categorias de la base de datos
+  const getCategories = async () => {
+    try {
+      return fetch("http://localhost:5000/dashboard/getCategories", {
+        method: "POST",
+        headers: { token: localStorage.token },
+      }).then((data) => data.json());
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const getSubcategories = async () => {
+    try {
+      return fetch("http://localhost:5000/dashboard/getSubcategories", {
+        method: "POST",
+        headers: { token: localStorage.token },
+      }).then((data) => data.json());
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  // Traer datos al cargar la pagina
+  useEffect(() => {
+    let mounted = true;
+    getCategories().then((items) => {
+      if (mounted) {
+        setCategories(items);
+      }
+    });
+    getSubcategories().then((items) => {
+      if (mounted) {
+        setSubcategories(items);
+      }
+    });
+    return () => (mounted = false);
+  }, []);
 
   // Functions
-  const onTitleChange = (event) => {
-    setTitleValue(event.currentTarget.value);
+  const setDateState = (e) => {
+    const string = e.toDate().toLocaleDateString();
+    setDate(string);
   };
 
-  const onDescriptionChange = (event) => {
-    setDescriptionValue(event.currentTarget.value);
+  const setTimeState = (e) => {
+    const string = `${e
+      .toDate()
+      .getHours()}:${e.toDate().getMinutes()}:${e.toDate().getSeconds()}`;
+    setTime(string);
   };
 
-  const onPriceChange = (event) => {
-    setPriceValue(event.currentTarget.value);
+  const updateImage = (newImages) => {
+    setImage(newImages);
   };
 
-  const onContinentsSelectChange = (event) => {
-    setContinentValue(event.currentTarget.value);
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    console.log(categoryId, subcategoryId, description, basePrice, date, time);
+    // Validar
   };
 
-  const updateImages = (newImages) => {
-    setImages(newImages);
-  };
-
-  const onSubmit = (event) => {
-    event.preventDefault();
-
-    if (
-      !TitleValue ||
-      !DescriptionValue ||
-      !PriceValue ||
-      !ContinentValue ||
-      !Images
-    ) {
-      return alert("fill all the fields first!");
-    }
-
-    const variables = {
-      /* writer: props.user.userData._id,
-            title: TitleValue,
-            description: DescriptionValue,
-            price: PriceValue,
-            images: Images,
-            continents: ContinentValue,*/
-    };
-
-    /*Axios.post('/api/product/uploadProduct', variables)
-            .then(response => {
-                if (response.data.success) {
-                    alert('Product Successfully Uploaded')
-                    props.history.push('/')
-                } else {
-                    alert('Failed to upload Product')
-                }
-            })*/
-  };
-
-  // Opciones de los dropdown
+  // Opciones de los dropdown menu
   const opcionesCategoria = (
-    <Menu>
-      <Menu.Item key="0">
-        <a href="https://www.antgroup.com">1st menu item</a>
-      </Menu.Item>
-      <Menu.Item key="1">
-        <a href="https://www.aliyun.com">2nd menu item</a>
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="3">3rd menu item</Menu.Item>
+    <Menu onClick={(e) => setCategoryId(e.key)}>
+      {categories.map((item) => (
+        <Menu.Item key={item.id} value={item.id}>
+          {item.nombre}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  const opcionesSubcategoria = (
+    <Menu onClick={(e) => setSubcategoryId(e.key)}>
+      {subcategories.map((item) => (
+        <Menu.Item key={item.id} value={item.id}>
+          {" "}
+          {item.nombre}
+        </Menu.Item>
+      ))}
     </Menu>
   );
 
@@ -115,9 +124,7 @@ const CreateAuctionView = (setAuth) => {
       </div>
       <Form onSubmit={onSubmit}>
         {/* DropZone */}
-        <FileUpload refreshFunction={updateImages} />
-        <label style={{ marginVertical: 15 }}>Nombre</label>
-        <Input onChange={onTitleChange} value={TitleValue} />
+        <FileUpload refreshFunction={updateImage} />
         {/* Seleccionadores de categoria y subcategoria */}
         <br />
         <br />
@@ -137,7 +144,7 @@ const CreateAuctionView = (setAuth) => {
               <label style={{ marginVertical: 15 }}>Subcategoría</label>
             </tr>
             <tr>
-              <Dropdown overlay={opcionesCategoria}>
+              <Dropdown overlay={opcionesSubcategoria}>
                 <Button>Seleccione la subcategoría</Button>
               </Dropdown>
             </tr>
@@ -146,25 +153,50 @@ const CreateAuctionView = (setAuth) => {
         <br />
         <br />
         <label>Descripción</label>
-        <TextArea onChange={onDescriptionChange} value={DescriptionValue} />
+        <TextArea
+          name="descripcion"
+          onChange={(e) => setDescription(e.target.value)}
+          value={description}
+        />
         <br />
         <br />
         <label>Precio(₡)</label>
-        <Input onChange={onPriceChange} value={PriceValue} type="number" />
+        <Input
+          onChange={(e) => setBasePrice(e.target.value)}
+          value={basePrice}
+          type="number"
+        />
         <br />
         <br />
         <label>Fecha de cierre</label>
         <br />
-        <DatePicker
+        {/* <DatePicker
           style={{ width: 300 }}
           format="DD/MM/YYYY"
           placeholder="Seleccione una fecha"
+          onChange={(e) => setDate(e.format("l"))}
+          value={date}
+        /> */}
+        <Input
+          onChange={(e) => setDate(e.target.value)}
+          value={date}
+          type="text"
         />
         <br />
         <br />
         <label>Hora de cierre</label>
         <br />
-        <TimePicker style={{ width: 300 }} placeholder="Seleccione una hora" />
+        <Input
+          onChange={(e) => setTime(e.target.value)}
+          value={time}
+          type="text"
+        />
+        {/* <TimePicker
+          style={{ width: 300 }}
+          placeholder="Seleccione una hora"
+          onChange={(e) => setTimeState(e)}
+          value={time}
+        /> */}
         <br />
         <br />
         <Button style={{ width: "100%" }} onClick={onSubmit}>

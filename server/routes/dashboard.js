@@ -17,18 +17,48 @@ router.get("/", authorization, async (req, res) => {
 });
 
 //Metodo para traer todos los items que estan en la base de datos
-router.post("/",async (req,res) =>{
+router.post("/", async (req, res) => {
   const client = await pool.connect();
-  console.log("Getting products")
-  try{
+  console.log("Getting products");
+  try {
     const queryText = "SELECT * FROM obtener_subastas()";
     const procedure = await client.query(queryText);
-    res.json(procedure.rows)
-    console.log(procedure.rows)
-  }catch(err){
-    console.error(err.message)
-    res.status(500).send("Error en el servidor")
+    res.json(procedure.rows);
+    console.log(procedure.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
   }
-})
+});
+
+// Método para traer las categorías
+router.post("/getCategories", async (req, res) => {
+  const client = await pool.connect();
+  console.log("Getting categories");
+  try {
+    const queryText = "SELECT * FROM obtener_categorias()";
+    const procedure = await client.query(queryText);
+    res.json(procedure.rows);
+    console.log(procedure.rows);
+  } catch (err) {
+    console.error("ERORR GETTING THE CATEGORIES", err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
+// Método para traer las subcategorías
+router.post("/getSubcategories", async (req, res) => {
+  const client = await pool.connect();
+  console.log("Getting subcategories");
+  try {
+    const queryText = "SELECT * FROM obtener_subcategorias()";
+    const procedure = await client.query(queryText);
+    res.json(procedure.rows);
+    console.log(procedure.rows);
+  } catch (err) {
+    console.error("ERORR GETTING THE SUBCATEGORIES", err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
 
 module.exports = router;

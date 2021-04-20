@@ -32,8 +32,6 @@ function FileUpload(props) {
     // Contenedor principal
     <div
       style={{
-        marginTop: 15,
-        marginBottom: 15,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -53,7 +51,6 @@ function FileUpload(props) {
       <div
         style={{
           marginTop: 15,
-          marginBottom: 15,
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
