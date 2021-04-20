@@ -9,7 +9,7 @@ import RegisterUserView from "./RegisterUserView";
 const Dashboard = ({ setAuth }) => {
   const [alias, setAlias] = useState("");
   const [userType, setUserType] = useState("");
-  const [view, setView] = useState("create_auction_view");
+  const [view, setView] = useState("");
 
   async function getUserData() {
     try {
@@ -43,7 +43,12 @@ const Dashboard = ({ setAuth }) => {
   return (
     <Fragment>
       <header>
-        <NavBar setView={setView} alias={alias} />
+        <NavBar
+          setView={setView}
+          alias={alias}
+          userType={userType}
+          logout={logout}
+        />
       </header>
       <body>
         <div>
@@ -54,13 +59,10 @@ const Dashboard = ({ setAuth }) => {
           ) : view === "register_user_view" && userType === "administrador" ? (
             <RegisterUserView />
           ) : (
-            <CategoryView />
+            <div></div>
           )}
         </div>
       </body>
-      <button className="btn btn-primary" onClick={(e) => logout(e)}>
-        Cerrar sesión
-      </button>
     </Fragment>
   );
 };

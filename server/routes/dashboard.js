@@ -16,5 +16,4 @@ router.get("/", authorization, async (req, res) => {
     res.status(500).send("Error en el servidor");
   }
 });
-
 module.exports = router;

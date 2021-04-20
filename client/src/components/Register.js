@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 
-const RegisterUserView = ({ setAuth }) => {
+const Register = ({ setAuth }) => {
   const [inputs, setInputs] = useState({
     cedula: "",
     tipo_usuario: "administrador",
@@ -43,7 +43,6 @@ const RegisterUserView = ({ setAuth }) => {
         direccion,
         correo,
       };
-
       const response = await fetch("http://localhost:5000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,7 +71,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={cedula}
           onChange={(e) => onChange(e)}
-          required
         />
 
         <label>
@@ -83,7 +81,6 @@ const RegisterUserView = ({ setAuth }) => {
             value="administrador"
             checked={tipo_usuario === "administrador"}
             onChange={(e) => onChange(e)}
-            required
           />
           Administrador
         </label>
@@ -95,7 +92,6 @@ const RegisterUserView = ({ setAuth }) => {
             value="participante"
             checked={tipo_usuario === "participante"}
             onChange={(e) => onChange(e)}
-            required
           />
           Participante
         </label>
@@ -107,7 +103,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={alias}
           onChange={(e) => onChange(e)}
-          required
         />
         <input
           type="password"
@@ -116,7 +111,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={contrasena}
           onChange={(e) => onChange(e)}
-          required
         />
         <input
           type="text"
@@ -125,7 +119,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={nombre}
           onChange={(e) => onChange(e)}
-          required
         />
         <input
           type="text"
@@ -134,7 +127,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={primer_apellido}
           onChange={(e) => onChange(e)}
-          required
         />
         <input
           type="text"
@@ -143,7 +135,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={segundo_apellido}
           onChange={(e) => onChange(e)}
-          required
         />
         <textarea
           id="direccion"
@@ -153,7 +144,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={direccion}
           onChange={(e) => onChange(e)}
-          required
         />
         <input
           type="email"
@@ -162,7 +152,6 @@ const RegisterUserView = ({ setAuth }) => {
           className="form-control my-3"
           value={correo}
           onChange={(e) => onChange(e)}
-          required
         />
         <button className="btn btn-success btn-block">Registrar</button>
       </form>
@@ -170,4 +159,4 @@ const RegisterUserView = ({ setAuth }) => {
   );
 };
 
-export default RegisterUserView;
+export default Register;
