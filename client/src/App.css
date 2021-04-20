@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 html,
 body,
 #root {
@@ -7,6 +8,9 @@ body,
 
 .App {
   display: flex;
+=======
+.App {
+>>>>>>> 37f9f45f692538e2162730f7a6064a3d2e493814
   text-align: center;
 }
 

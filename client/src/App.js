@@ -10,9 +10,9 @@ import {
 } from "react-router-dom";
 
 // components
-import Dashboard from "./views/Dashboard";
+import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
-import Register from "./views/RegisterUserView";
+import Register from "./components/Register";
 import UploadItem from "./components/UploadItem";
 
 function App() {
@@ -81,11 +81,10 @@ function App() {
                   )
                 }
               ></Route>
-              <Route
-                exact
-                path="/uploadSubasta"
-                render={(props) => <UploadItem {...props} />}
-              ></Route>
+              <Route exact path ="/uploadSubasta" render={(props) =>
+                <UploadItem {...props}/>
+                  }>
+              </Route>
             </Switch>
           </div>
         </Router>
