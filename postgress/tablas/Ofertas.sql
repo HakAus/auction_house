@@ -5,7 +5,7 @@ CREATE TABLE Ofertas
     IdOfertante INT NOT NULL,
     Monto DECIMAL(9,2) NOT NULL,
     FechaTiempo TIMESTAMP NOT NULL,
-    Ganadora BOOLEAN NOT NULL,
+    Ganadora INT NOT NULL,
 
     CONSTRAINT FK_Subastas_Ofertas
     FOREIGN KEY (IdSubasta)
