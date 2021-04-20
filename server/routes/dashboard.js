@@ -21,7 +21,7 @@ router.post("/",async (req,res) =>{
   const client = await pool.connect();
   console.log("Getting products")
   try{
-    const queryText = "SELECT * FROM get_Items()";
+    const queryText = "SELECT * FROM obtener_subastas()";
     const procedure = await client.query(queryText);
     res.json(procedure.rows)
     console.log(procedure.rows)
