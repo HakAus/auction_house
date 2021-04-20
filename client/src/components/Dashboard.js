@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Row,Card,Col } from 'antd';
+import { Row,Card,Col, Result } from 'antd';
 import Icon from '@ant-design/icons';
 import ImageSlider from './ImageSlider.js';
 import CheckBox from './CheckBox';
@@ -29,28 +29,26 @@ const Dashboard = ({ setAuth }) => {
     }
   }
 
-  async function getProducts(variables){
+  async function getProducts(){
 
     try {
-      const response = await fetch("http://localhost:5000/dashboard", {
+      return fetch("http://localhost:5000/dashboard", {
         method: "POST",
         headers: { token: localStorage.token },
-      });
-
-      const parseResponse = await response.json();
-      if (variables.loadMore) {
-        setProducts([...Products, ...response.data.products])
-      } else {
-          setProducts(response.data.products)
-      }
-      setPostSize(response.data.postSize)
+      }).then(data => data.json());
+      //const parseResponse = await response.json();
+      //console.log(parseResponse)
+      //var array = [];
+      //for (var i in parseResponse)
+        //array.push([parseResponse[i],i])
+      //return array;
     } catch (err) {
       console.error(err.message);
       //Alert('Failed')
     }
   }
   
-
+  const [Products, setProducts] = useState([])
   const logout = (e) => {
     // Se evita el refreso de la página.
     e.preventDefault();
@@ -59,12 +57,18 @@ const Dashboard = ({ setAuth }) => {
     // Se actualiza la autorización a falso.
     setAuth(false);
   };
-  useEffect(() => {
-    getAlias();
-    getProducts();
-  }, []);
 
-  const [Products, setProducts] = useState([])
+  useEffect(() => {
+    let mounted = true;
+    getProducts()
+      .then(items => {
+        if(mounted) {
+          setProducts(items)
+        }
+      })
+    return () => mounted = false;
+  }, [])
+
   const [Skip, setSkip] = useState(0)
   const [Limit, setLimit] = useState(8)
   const [PostSize, setPostSize] = useState()
@@ -74,16 +78,6 @@ const Dashboard = ({ setAuth }) => {
     price: []
 })
 
-useEffect(() => {
-
-  const variables = {
-      skip: Skip,
-      limit: Limit,
-  }
-
-  getProducts(variables)
-
-}, [])
 
 
 
@@ -102,20 +96,22 @@ const onLoadMore = () => {
 }
 
 
-const renderCards = Products.map((product, index) => {
 
+const renderCards = Products.map((product, index) => {
+console.log(index);
+console.log(product);
   return <Col lg={6} md={8} xs={24}>
       <Card
           hoverable={true}
-          cover={<a href> <ImageSlider images /></a>}
+          cover={<a href={`/product/${product.iditem}`} > <ImageSlider images={product.images} /></a>}
       >
           <Meta
-              title
-              description
+              title={product.descripcion}
+              description={`$${product.preciobase}`}
           />
       </Card>
   </Col>
-});
+})
 
 
 const showFilteredResults = (filters) => {
@@ -161,6 +157,10 @@ const handleFilters = (filters, category) => {
 
   showFilteredResults(newFilters)
   setFilters(newFilters)
+}
+
+const testing=(response) =>{
+  console.log(response)
 }
 
 const updateSearchTerms = (newSearchTerm) => {
@@ -214,8 +214,6 @@ const updateSearchTerms = (newSearchTerm) => {
                 />
 
             </div>
-
-
             {Products.length === 0 ?
                 <div style={{ display: 'flex', height: '300px', justifyContent: 'center', alignItems: 'center' }}>
                     <h2>No post yet...</h2>
@@ -223,7 +221,7 @@ const updateSearchTerms = (newSearchTerm) => {
                 <div>
                     <Row gutter={[16, 16]}>
 
-                        {renderCards}
+                      {renderCards}
 
                     </Row>
 

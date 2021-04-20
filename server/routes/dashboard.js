@@ -8,7 +8,6 @@ router.get("/", authorization, async (req, res) => {
     // Del middleware "authorization" obtenemos el id del usuario validado (la cedula)
 
     const queryText = "SELECT * FROM obtener_info_usuario($1)";
-    console.log(req.user)
     const procedure = await client.query(queryText, [req.user]);
     res.json(procedure.rows[0]);
   } catch (err) {
@@ -22,9 +21,10 @@ router.post("/",async (req,res) =>{
   const client = await pool.connect();
   console.log("Getting products")
   try{
-    const queryText = "SELECT * FROM Items";
+    const queryText = "SELECT * FROM get_Items()";
     const procedure = await client.query(queryText);
-    res.json(procedure)
+    res.json(procedure.rows)
+    console.log(procedure.rows)
   }catch(err){
     console.error(err.message)
     res.status(500).send("Error en el servidor")
