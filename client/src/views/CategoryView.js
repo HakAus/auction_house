@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Row,Card,Col, Result } from 'antd';
 import Icon from '@ant-design/icons';
 import CheckBox from "../components/CheckBox";
@@ -8,7 +8,7 @@ import SearchFeature from "../components/SearchFeature";
 import ImageSlider from "../components/ImageSlider.js";
 
 const { Meta } = Card;
-
+const CategoriyView = () => {
   async function getProducts(){
 
     try {
@@ -28,9 +28,10 @@ const { Meta } = Card;
     // Se elimina el token asignado.
     localStorage.removeItem("token");
     // Se actualiza la autorización a falso.
-    setAuth(false);
+    //setAuth(false);
   };
 
+  
   useEffect(() => {
     let mounted = true;
     getProducts()
@@ -63,7 +64,7 @@ const onLoadMore = () => {
   }
   getProducts(variables)
   setSkip(skip)
-}
+};
 
 
 
@@ -127,10 +128,6 @@ const handleFilters = (filters, category) => {
 
   showFilteredResults(newFilters)
   setFilters(newFilters)
-}
-
-const testing=(response) =>{
-  console.log(response)
 }
 
 const updateSearchTerms = (newSearchTerm) => {
@@ -204,11 +201,12 @@ const updateSearchTerms = (newSearchTerm) => {
             }
 
 
-        </div>
+
       <button className="btn btn-primary" onClick={(e) => logout(e)}>
         Cerrar sesión
       </button>
+      </div>
   );
-          }
+          };
 
-export default Dashboard;
+export default CategoriyView;
