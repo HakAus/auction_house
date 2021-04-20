@@ -12,5 +12,5 @@ end; $$
 
 ALTER FUNCTION obtener_subastas() SET SCHEMA casa_subastas_schema;
 ALTER FUNCTION obtener_subastas() OWNER TO app;
-GRANT EXECUTE ON FUNCTION obtener_subastas() TO administrador_subastas;
+-- GRANT EXECUTE ON FUNCTION obtener_subastas() TO administrador_subastas;
 GRANT EXECUTE ON FUNCTION obtener_subastas() TO participante_subastas;

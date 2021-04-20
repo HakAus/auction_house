@@ -18,5 +18,5 @@ Insert into subcategorias values (4,3,'Consolas','Pa jugah')
 --Borrar para hacer el cambio
 DROP FUNCTION get_items();
 --Insercion de subastas, tomar en cuenta el idDelUsuario
-INSERT INTO Subastas values(1,3,111111111,timestamp '20/4/21','Parque de desampa llamar al vendedor')
-INSERT INTO Subastas values(2,1,111111111,timestamp '20/4/21','Parque de desampa llamar al vendedor')
+INSERT INTO Subastas values(3,111111111,timestamp '20/4/21','Parque de desampa llamar al vendedor');
+INSERT INTO Subastas values(1,111111111,timestamp '20/4/21','Parque de desampa llamar al vendedor');
