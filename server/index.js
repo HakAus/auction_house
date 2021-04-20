@@ -22,8 +22,6 @@ app.use("/auth", require("./routes/jwtAuth"));
 /* Ruta para el dashboard o menu principal */
 app.use("/dashboard", require("./routes/dashboard"));
 
-
-
 // Inicia el servidor en el localhost y el puerto dado
 app.listen(5000, () => {
   console.log("Server listening on port 5000 ...");

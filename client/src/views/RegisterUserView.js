@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 
-const Register = ({ setAuth }) => {
+const RegisterUserView = ({ setAuth }) => {
   const [inputs, setInputs] = useState({
     cedula: "",
     tipo_usuario: "administrador",
@@ -9,7 +9,7 @@ const Register = ({ setAuth }) => {
     contrasena: "",
     nombre: "",
     primer_apellido: "",
-    segundo_apellido: "", 
+    segundo_apellido: "",
     direccion: "",
     correo: "",
   });
@@ -44,6 +44,7 @@ const Register = ({ setAuth }) => {
         direccion,
         correo,
       };
+
       const response = await fetch("http://localhost:5000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,6 +73,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={cedula}
           onChange={(e) => onChange(e)}
+          required
         />
 
         <label>
@@ -82,6 +84,7 @@ const Register = ({ setAuth }) => {
             value="administrador"
             checked={tipo_usuario === "administrador"}
             onChange={(e) => onChange(e)}
+            required
           />
           Administrador
         </label>
@@ -93,6 +96,7 @@ const Register = ({ setAuth }) => {
             value="participante"
             checked={tipo_usuario === "participante"}
             onChange={(e) => onChange(e)}
+            required
           />
           Participante
         </label>
@@ -104,6 +108,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={alias}
           onChange={(e) => onChange(e)}
+          required
         />
         <input
           type="password"
@@ -112,6 +117,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={contrasena}
           onChange={(e) => onChange(e)}
+          required
         />
         <input
           type="text"
@@ -120,6 +126,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={nombre}
           onChange={(e) => onChange(e)}
+          required
         />
         <input
           type="text"
@@ -128,6 +135,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={primer_apellido}
           onChange={(e) => onChange(e)}
+          required
         />
         <input
           type="text"
@@ -136,6 +144,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={segundo_apellido}
           onChange={(e) => onChange(e)}
+          required
         />
         <textarea
           id="direccion"
@@ -145,6 +154,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={direccion}
           onChange={(e) => onChange(e)}
+          required
         />
         <input
           type="email"
@@ -153,6 +163,7 @@ const Register = ({ setAuth }) => {
           className="form-control my-3"
           value={correo}
           onChange={(e) => onChange(e)}
+          required
         />
         <button className="btn btn-success btn-block">Registrar</button>
       </form>
@@ -161,4 +172,4 @@ const Register = ({ setAuth }) => {
   );
 };
 
-export default Register;
+export default RegisterUserView;
