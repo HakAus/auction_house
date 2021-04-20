@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Row, Card, Col } from "antd";
-import Icon from "@ant-design/icons";
+import React, { Fragment, useState, useEffect } from "react";
+import { Row,Card,Col, Result } from 'antd';
+import Icon from '@ant-design/icons';
 import CheckBox from "../components/CheckBox";
 import RadioBox from "../components/RadioBox";
 import { categorias, price } from "../components/Datas";
@@ -9,177 +9,206 @@ import ImageSlider from "../components/ImageSlider.js";
 
 const { Meta } = Card;
 
-const CategoriyView = () => {
-  const [Products, setProducts] = useState([]);
-  const [Skip, setSkip] = useState(0);
-  const [Limit, setLimit] = useState(8);
-  const [PostSize, setPostSize] = useState();
-  const [SearchTerms, setSearchTerms] = useState("");
-  const [Filters, setFilters] = useState({
-    categorias: [],
-    price: [],
-  });
+  async function getProducts(){
 
-  useEffect(() => {
-    const variables = {
-      skip: Skip,
-      limit: Limit,
-    };
-
-    getProducts(variables);
-  }, []);
-
-  const getProducts = (variables) => {
-    /*base*/
+    try {
+      return fetch("http://localhost:5000/dashboard", {
+        method: "POST",
+        headers: { token: localStorage.token },
+      }).then(data => data.json());
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+  
+  const [Products, setProducts] = useState([])
+  const logout = (e) => {
+    // Se evita el refreso de la página.
+    e.preventDefault();
+    // Se elimina el token asignado.
+    localStorage.removeItem("token");
+    // Se actualiza la autorización a falso.
+    setAuth(false);
   };
 
-  const onLoadMore = () => {
-    let skip = Skip + Limit;
+  useEffect(() => {
+    let mounted = true;
+    getProducts()
+      .then(items => {
+        if(mounted) {
+          setProducts(items)
+        }
+      })
+    return () => mounted = false;
+  }, [])
 
-    const variables = {
+  const [Skip, setSkip] = useState(0)
+  const [Limit, setLimit] = useState(8)
+  const [PostSize, setPostSize] = useState()
+  const [SearchTerms, setSearchTerms] = useState("")
+  const [Filters, setFilters] = useState({
+    categorias: [],
+    price: []
+})
+
+const onLoadMore = () => {
+  let skip = Skip + Limit;
+
+  const variables = {
       skip: skip,
       limit: Limit,
       loadMore: true,
       filters: Filters,
-      searchTerm: SearchTerms,
-    };
-    getProducts(variables);
-    setSkip(skip);
-  };
+      searchTerm: SearchTerms
+  }
+  getProducts(variables)
+  setSkip(skip)
+}
 
-  const renderCards = Products.map((product, index) => {
-    return (
-      <Col lg={6} md={8} xs={24}>
-        <Card
+
+
+const renderCards = Products.map((product, index) => {
+console.log(index);
+console.log(product);
+  return <Col lg={6} md={8} xs={24}>
+      <Card
           hoverable={true}
-          cover={
-            <a href>
-              {" "}
-              <ImageSlider images />
-            </a>
-          }
-        >
-          <Meta title description />
-        </Card>
-      </Col>
-    );
-  });
+          cover={<a href={`/product/${product.iditem}`} > <ImageSlider images={product.images} /></a>}
+      >
+          <Meta
+              title={product.descripcion}
+              description={`$${product.preciobase}`}
+          />
+      </Card>
+  </Col>
+})
 
-  const showFilteredResults = (filters) => {
-    const variables = {
+
+const showFilteredResults = (filters) => {
+
+  const variables = {
       skip: 0,
       limit: Limit,
-      filters: filters,
-    };
-    getProducts(variables);
-    setSkip(0);
-  };
+      filters: filters
 
-  const handlePrice = (value) => {
-    const data = price;
-    let array = [];
+  }
+  getProducts(variables)
+  setSkip(0)
 
-    for (let key in data) {
+}
+
+const handlePrice = (value) => {
+  const data = price;
+  let array = [];
+
+  for (let key in data) {
+
       if (data[key]._id === parseInt(value, 10)) {
-        array = data[key].array;
+          array = data[key].array;
       }
-    }
-    console.log("array", array);
-    return array;
-  };
+  }
+  console.log('array', array)
+  return array
+}
 
-  const handleFilters = (filters, category) => {
-    const newFilters = { ...Filters };
+const handleFilters = (filters, category) => {
 
-    newFilters[category] = filters;
+  const newFilters = { ...Filters }
 
-    if (category === "price") {
-      let priceValues = handlePrice(filters);
-      newFilters[category] = priceValues;
-    }
+  newFilters[category] = filters
 
-    console.log(newFilters);
+  if (category === "price") {
+      let priceValues = handlePrice(filters)
+      newFilters[category] = priceValues
 
-    showFilteredResults(newFilters);
-    setFilters(newFilters);
-  };
+  }
 
-  const updateSearchTerms = (newSearchTerm) => {
-    const variables = {
+  console.log(newFilters)
+
+  showFilteredResults(newFilters)
+  setFilters(newFilters)
+}
+
+const testing=(response) =>{
+  console.log(response)
+}
+
+const updateSearchTerms = (newSearchTerm) => {
+
+  const variables = {
       skip: 0,
       limit: Limit,
       filters: Filters,
-      searchTerm: newSearchTerm,
-    };
+      searchTerm: newSearchTerm
+  }
 
-    setSkip(0);
-    setSearchTerms(newSearchTerm);
+  setSkip(0)
+  setSearchTerms(newSearchTerm)
 
-    getProducts(variables);
-  };
+  getProducts(variables)
+}
 
   return (
-    <div style={{ width: "75%", margin: "3rem auto" }}>
-      <div style={{ textAlign: "center" }}>
-        <h2>
-          Seleccione una categoría de su interés <Icon type="rocket" />{" "}
-        </h2>
-      </div>
+      <div style={{ width: '75%', margin: '3rem auto' }}>
+            <div style={{ textAlign: 'center' }}>
+                <h2>  Vamoh a subastar!  <Icon type="rocket" />  </h2>
+            </div>
 
-      {/* Filter  */}
 
-      <Row gutter={[16, 16]}>
-        <Col lg={12} xs={24}>
-          <CheckBox
-            list={categorias}
-            handleFilters={(filters) => handleFilters(filters, "categorias")}
-          />
-        </Col>
-        <Col lg={12} xs={24}>
-          <RadioBox
-            list={price}
-            handleFilters={(filters) => handleFilters(filters, "price")}
-          />
-        </Col>
-      </Row>
+            {/* Filter  */}
 
-      {/* Search  */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          margin: "1rem auto",
-        }}
-      >
-        <SearchFeature refreshFunction={updateSearchTerms} />
-      </div>
+            <Row gutter={[16, 16]}>
+                <Col lg={12} xs={24} >
+                    <CheckBox
+                        list={categorias}
+                        handleFilters={filters => handleFilters(filters, "categorias")}
+                    />
+                </Col>
+                <Col lg={12} xs={24}>
+                    <RadioBox
+                        list={price}
+                        handleFilters={filters => handleFilters(filters, "price")}
+                    />
+                </Col>
+            </Row>
 
-      {Products.length === 0 ? (
-        <div
-          style={{
-            display: "flex",
-            height: "300px",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <h2>No post yet...</h2>
+
+            {/* Search  */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem auto' }}>
+
+                <SearchFeature
+                    refreshFunction={updateSearchTerms}
+                />
+
+            </div>
+            {Products.length === 0 ?
+                <div style={{ display: 'flex', height: '300px', justifyContent: 'center', alignItems: 'center' }}>
+                    <h2>No post yet...</h2>
+                </div> :
+                <div>
+                    <Row gutter={[16, 16]}>
+
+                      {renderCards}
+
+                    </Row>
+
+
+                </div>
+            }
+            <br /><br />
+
+            {PostSize >= Limit &&
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button onClick={onLoadMore}>Load More</button>
+                </div>
+            }
+
+
         </div>
-      ) : (
-        <div>
-          <Row gutter={[16, 16]}>{renderCards}</Row>
-        </div>
-      )}
-      <br />
-      <br />
-
-      {PostSize >= Limit && (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <button onClick={onLoadMore}>Load More</button>
-        </div>
-      )}
-    </div>
+      <button className="btn btn-primary" onClick={(e) => logout(e)}>
+        Cerrar sesión
+      </button>
   );
-};
+          }
 
-export default CategoriyView;
+export default Dashboard;
