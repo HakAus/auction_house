@@ -59,6 +59,14 @@ LANGUAGE plpgsql
 SECURITY DEFINER
     SET search_path = casa_subastas_schema, pg_temp;
 
+
+select 
+ * 
+from information_schema.role_table_grants 
+where grantee='participante_subastas'
+;
+
+
 ALTER PROCEDURE registrar_usuario(int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) SET SCHEMA casa_subastas_schema;
 
 ALTER PROCEDURE registrar_usuario(int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) OWNER TO app;
