@@ -1,0 +1,15 @@
+CREATE TABLE ComentariosComprador
+(
+    IdComentario SERIAL NOT NULL PRIMARY KEY,
+    IdVenta INT NOT NULL,
+    Comentario TEXT NOT NULL,
+    FechaHora TIMESTAMP NOT NULL,
+    Calificacion INT NOT NULL,
+
+    CONSTRAINT FK_ComentariosComprador_Ventas
+    FOREIGN KEY (IdVenta)
+    REFERENCES Ventas(IdVenta),
+
+    CONSTRAINT C_Formato_Calificacion_Valido
+    CHECK (Contrasena ~ '^\d$')
+);
