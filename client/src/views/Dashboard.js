@@ -6,18 +6,24 @@ import CategoryView from "./CategoryView";
 import CreateAuctionView from "./CreateAuctionView";
 import RegisterUserView from "./RegisterUserView";
 import AuctHistoryView from "./AuctHistoryView";
+import UserListView from "./UserListView";
+import UserAuctsView from "./UserAuctsView";
 
 const Dashboard = ({ setAuth }) => {
   const [alias, setAlias] = useState("");
   const [userType, setUserType] = useState("");
   const [view, setView] = useState("");
   const [Subasta,setSubasta] = useState("")
+  const [Usuario,setUsuario] = useState("")
 
   const getAuctData = (e,Subasta) => {
     setSubasta(Subasta)
-    console.log("Entra a setear subasta")
-    console.log(Subasta)
     setView("auct_history")
+  }
+
+  const setAuctList = (e,fetchedId) =>{
+    setUsuario(fetchedId)
+    setView("user_auct_list")
   }
 
   async function getUserData() {
@@ -73,7 +79,13 @@ const Dashboard = ({ setAuth }) => {
           ) : view === "auct_history" && userType === "participante" ?(
             <AuctHistoryView 
              Subasta = {Subasta}/>
-          ):(
+          ) : view === "user_list" && userType === "participante" ?(
+              <UserListView 
+              setAuctList = {setAuctList}/>
+            ): view === "user_auct_list" && userType === "participante" ?(
+              <UserAuctsView 
+              Usuario = {Usuario}/>
+            ):(
             <div></div>
           )}
         </div>

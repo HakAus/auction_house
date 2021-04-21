@@ -4,12 +4,19 @@ import React, { useState, useEffect } from "react";
 
 const AuctHistoryView = ({Subasta}) => {
 
+  const [inputs, setInputs] = useState({
+    monto: ""
+  });
+
+  const {
+    monto
+  } = inputs;
+
     const [History,setHistory] = useState([])
 
     async function getHistory(){
 
         try {
-          //Aca se le pasa
           const body = {idsubasta:Subasta.idsubasta};
           console.log(Subasta)
           console.log(body)
@@ -23,6 +30,10 @@ const AuctHistoryView = ({Subasta}) => {
           
         }
       }
+
+      const onChange = (e) => {
+        setInputs({ ...inputs, [e.target.name]: e.target.value });
+      };
 
     useEffect(() => {
         let mounted = true;
@@ -53,6 +64,24 @@ const AuctHistoryView = ({Subasta}) => {
                     </tr>
                 </thead>
                 
+       
+         <input
+          type="text"
+          name="monto"
+          placeholder="monto"
+          className="form-control my-3"
+          value={monto}
+          onChange={(e) => onChange(e)}
+          />
+
+          <button
+            type="button"
+            class="btn btn-light mx-2"
+          >
+            Pujar
+          </button>
+
+
                 {History.length !==0?
                 <tbody>
                     {History.map(item => (
