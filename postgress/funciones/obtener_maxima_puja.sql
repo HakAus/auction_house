@@ -1,11 +1,11 @@
-CREATE OR REPLACE FUNCTION obtener_maxima_puja(p_id_subasta int) RETURNS TABLE(INT)
+CREATE OR REPLACE FUNCTION obtener_maxima_puja(p_id_subasta int) RETURNS NUMERIC
 AS
 $$
 DECLARE
-    maxPrice int;
+    maxPrice NUMERIC;
 BEGIN
-    Return QUERY
     SELECT INTO maxPrice Max(monto) from Ofertas where IdSubasta = p_id_subasta;
+	RETURN maxPrice;
 END;
 $$ LANGUAGE plpgsql
  SECURITY DEFINER

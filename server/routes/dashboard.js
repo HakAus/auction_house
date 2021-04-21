@@ -143,6 +143,7 @@ router.post("/ofertar",authorization, async (req, res) => {//No puedo sacar la a
     await client.query("BEGIN")
     const maxPrice = await client.query(checkQuerry, [idsubasta]);//Que pasa con 0 ofertas?
     const maxBid = Number(maxPrice.rows[0].obtener_maxima_puja);
+    console.log(maxBid)
     if(maxBid + maxBid*0.5 < monto){
       const procedure = await client.query(queryText, [monto,req.user,idsubasta]);
       res.json(procedure.rows);
