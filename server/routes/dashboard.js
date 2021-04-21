@@ -83,12 +83,15 @@ router.post("/addAuction", async (req, res) => {
   try {
     const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
     const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
+
     const itemId = await client.query(createItemQuery, [
       subcategoryId,
       basePrice,
       description,
       image,
     ]);
+
+    await client.query("BEGIN");
 
     console.log(
       "Para meter en crear subastas: ",
@@ -98,12 +101,14 @@ router.post("/addAuction", async (req, res) => {
       deliveryDetails
     );
 
-    const response = await client.query(createAuctionText, [
+    await client.query(createAuctionText, [
       itemId.rows[0].crear_item,
       sellerAlias,
       datetime,
       deliveryDetails,
     ]);
+
+    await client.query("END;");
 
     res.json("Subasta agregada correctamente");
   } catch (err) {
