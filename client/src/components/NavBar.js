@@ -43,6 +43,15 @@ const ParticipanteNavBarOptions = ({ setView, alias, logout }) => {
             Crear subasta
           </button>
         </li>
+        <li class="nav-item">
+          <button
+            type="button"
+            class="btn btn-light mx-2"
+            onClick={() => setView("user_list")}
+          >
+            Lista de Usuarios
+          </button>
+        </li>
         <li class="nav-item mx-2">
           <button className="btn btn-primary " onClick={(e) => logout(e)}>
             Cerrar sesión

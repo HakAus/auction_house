@@ -5,11 +5,26 @@ import NavBar from "../components/NavBar";
 import CategoryView from "./CategoryView";
 import CreateAuctionView from "./CreateAuctionView";
 import RegisterUserView from "./RegisterUserView";
+import AuctHistoryView from "./AuctHistoryView";
+import UserListView from "./UserListView";
+import UserAuctsView from "./UserAuctsView";
 
 const Dashboard = ({ setAuth }) => {
   const [alias, setAlias] = useState("");
   const [userType, setUserType] = useState("");
   const [view, setView] = useState("");
+  const [Subasta,setSubasta] = useState("")
+  const [Usuario,setUsuario] = useState("")
+
+  const getAuctData = (e,Subasta) => {
+    setSubasta(Subasta)
+    setView("auct_history")
+  }
+
+  const setAuctList = (e,fetchedId) =>{
+    setUsuario(fetchedId)
+    setView("user_auct_list")
+  }
 
   async function getUserData() {
     try {
@@ -40,6 +55,7 @@ const Dashboard = ({ setAuth }) => {
     getUserData();
   }, []);
 
+
   return (
     <Fragment>
       <header>
@@ -53,12 +69,23 @@ const Dashboard = ({ setAuth }) => {
       <body>
         <div>
           {view === "category_view" && userType === "participante" ? (
-            <CategoryView />
+            <CategoryView 
+              getAuctData={getAuctData}
+            />
           ) : view === "create_auction_view" && userType === "participante" ? (
             <CreateAuctionView sellerAlias={alias} />
           ) : view === "register_user_view" && userType === "administrador" ? (
             <RegisterUserView />
-          ) : (
+          ) : view === "auct_history" && userType === "participante" ?(
+            <AuctHistoryView 
+             Subasta = {Subasta}/>
+          ) : view === "user_list" && userType === "participante" ?(
+              <UserListView 
+              setAuctList = {setAuctList}/>
+            ): view === "user_auct_list" && userType === "participante" ?(
+              <UserAuctsView 
+              Usuario = {Usuario}/>
+            ):(
             <div></div>
           )}
         </div>

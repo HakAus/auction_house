@@ -8,7 +8,7 @@ import SearchFeature from "../components/SearchFeature";
 import ImageSlider from "../components/ImageSlider.js";
 
 const { Meta } = Card;
-const CategoriyView = () => {
+const CategoriyView = ({ getAuctData }) => {
   async function getProducts() {
     try {
       return fetch("http://localhost:5000/dashboard", {
@@ -80,6 +80,7 @@ const CategoriyView = () => {
           <Meta
             title={product.descripcion}
             description={`$${product.preciobase}`}
+            onClick={(e) => getAuctData(e, product)}
           />
         </Card>
       </Col>
