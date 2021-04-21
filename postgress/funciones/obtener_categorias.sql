@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION obtener_categorias() 
-RETURNS TABLE (id INT, nombre VARCHAR(100), descripcion TEXT)
+RETURNS TABLE (id INT, nombre VARCHAR(100))
 LANGUAGE plpgsql
 AS $$
 BEGIN

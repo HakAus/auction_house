@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION obtener_subcategorias() 
-RETURNS TABLE (id INT, idCategoria INT, nombre VARCHAR(100), descripcion TEXT)
+RETURNS TABLE (id INT, idCategoria INT, nombre VARCHAR(100))
 LANGUAGE plpgsql
 AS $$
 BEGIN

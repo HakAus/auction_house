@@ -1,19 +1,22 @@
+// Componentes propios
+import CategoriesModal from "../components/CateogorySelectors";
+
 import React, { useEffect, useState } from "react";
 import {
   Menu,
   Dropdown,
   TimePicker,
   DatePicker,
+  Modal,
   Typography,
   Button,
   Form,
   Input,
 } from "antd";
 import FileUpload from "../components/FileUpload";
+import CategorySelectors from "../components/CateogorySelectors";
 const { Title } = Typography;
 const { TextArea } = Input;
-
-// Componentes propios
 
 const CreateAuctionView = ({ sellerAlias }) => {
   // Hooks
@@ -162,35 +165,12 @@ const CreateAuctionView = ({ sellerAlias }) => {
         {/* Seleccionadores de categoria y subcategoria */}
         <br />
         <br />
-        <table style={{ width: "100%", tableLayout: "fixed" }}>
-          <td>
-            <tr style={{ alignItems: "center" }}>
-              <label>Categoría</label>
-            </tr>
-            <tr>
-              <Dropdown overlay={opcionesCategoria}>
-                <Button>Seleccione la categoría</Button>
-              </Dropdown>
-            </tr>
-            <tr>
-              {" "}
-              <label>Usted seleccionó: {categoryId}</label>{" "}
-            </tr>
-          </td>
-          <td>
-            <tr>
-              <label style={{ marginVertical: 15 }}>Subcategoría</label>
-            </tr>
-            <tr>
-              <Dropdown overlay={opcionesSubcategoria}>
-                <Button>Seleccione la subcategoría</Button>
-              </Dropdown>
-            </tr>
-            <tr>
-              <label>Usted seleccionó: {subcategoryId}</label>
-            </tr>
-          </td>
-        </table>
+        <CategorySelectors
+          categories={categories}
+          subcategories={subcategories}
+          setCategoryId={setSubcategoryId}
+          setSubcategoryId={setSubcategoryId}
+        />
         <br />
         <br />
         <label>Descripción del item</label>
