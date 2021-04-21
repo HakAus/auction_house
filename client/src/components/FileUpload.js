@@ -3,7 +3,7 @@ import Dropzone from "react-dropzone";
 import Icon from "@ant-design/icons";
 function FileUpload(props) {
   //Hooks
-  const [Images, setImages] = useState([]);
+  const [image, setImage] = useState();
 
   // Functions
   const onDrop = (files) => {
@@ -11,20 +11,22 @@ function FileUpload(props) {
     const config = {
       header: { "content-type": "multipart/form-data" },
     };
-    formData.append("file", files[0]);
+    formData.append("file", files[(0, files[0].name)]);
+
     //save the Image we chose inside the Node Server
-    setImages([...Images, files[0].image]);
-    props.refreshFunction([...Images, files[0].image]);
+    console.log(files);
+    setImage(files[0]);
+    props.refreshFunction(files[0]);
   };
 
-  const onDelete = (image) => {
-    const currentIndex = Images.indexOf(image);
+  const onDelete = (i) => {
+    const currentIndex = image;
 
-    let newImages = [...Images];
-    newImages.splice(currentIndex, 1);
+    // let newImages = [...Images];
+    // newImages.splice(currentIndex, 1);
 
-    setImages(newImages);
-    props.refreshFunction(newImages);
+    setImage(null);
+    props.refreshFunction(null);
   };
 
   // JSX
@@ -72,7 +74,7 @@ function FileUpload(props) {
               {console.log("getRootProps", { ...getRootProps() })}
               {console.log("getInputProps", { ...getInputProps() })}
               <input {...getInputProps()} />
-              <Icon type="plus" style={{ fontSize: "3rem" }} />
+              <Icon type="plus" style={{ color: "black", fontSize: "3rem" }} />
             </div>
           )}
         </Dropzone>
@@ -85,15 +87,13 @@ function FileUpload(props) {
             overflowX: "scroll",
           }}
         >
-          {Images.map((image, index) => (
-            <div onClick={() => onDelete(image)}>
-              <img
-                style={{ minWidth: "300px", width: "300px", height: "240px" }}
-                src={`http://localhost:5000/${image}`}
-                alt={`productImg-${index}`}
-              />
-            </div>
-          ))}
+          {
+            <img
+              style={{ minWidth: "300px", width: "300px", height: "240px" }}
+              src={`http://localhost:5000/${image}`}
+              alt={`imagen del producto`}
+            />
+          }
         </div>
       </div>
     </div>

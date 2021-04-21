@@ -1,15 +1,19 @@
 CREATE OR REPLACE PROCEDURE crear_subasta
 (
     IN p_id_item_subastado INT, 
-    IN p_id_vendedor INT, 
+    IN p_alias_vendedor VARCHAR(100), 
     IN p_fecha_hora_cierre TIMESTAMP, 
     IN p_detalles_de_entrega TEXT
 )
 AS
 $$
+DECLARE
+    id_vendedor INT := 0;
 BEGIN
+
+    SELECT U.Cedula INTO id_vendedor FROM Usuarios U WHERE U.Alias = p_alias_vendedor;
     INSERT INTO Subastas (IdItemSubastado, IdVendedor, FechaHoraCierre, DetallesDeEntrega)
-    VALUES (p_id_item_subastado, p_id_vendedor, p_fecha_hora_cierre, p_detalles_de_entrega);
+    VALUES (p_id_item_subastado, id_vendedor, p_fecha_hora_cierre, p_detalles_de_entrega);
 END;
 $$ LANGUAGE plpgsql
  SECURITY DEFINER

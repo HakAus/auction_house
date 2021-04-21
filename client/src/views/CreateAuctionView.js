@@ -10,20 +10,19 @@ import {
   Input,
 } from "antd";
 import FileUpload from "../components/FileUpload";
-import Icon from "@ant-design/icons";
-import moment from "moment";
 const { Title } = Typography;
 const { TextArea } = Input;
 
 // Componentes propios
 
-const CreateAuctionView = (setAuth) => {
+const CreateAuctionView = ({ sellerAlias }) => {
   // Hooks
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [categoryId, setCategoryId] = useState(0);
   const [subcategoryId, setSubcategoryId] = useState(0);
   const [description, setDescription] = useState("");
+  const [deliveryDetails, setDeliveryDetails] = useState("");
   const [basePrice, setBasePrice] = useState(0.0);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -69,26 +68,61 @@ const CreateAuctionView = (setAuth) => {
   }, []);
 
   // Functions
-  const setDateState = (e) => {
-    const string = e.toDate().toLocaleDateString();
-    setDate(string);
-  };
 
-  const setTimeState = (e) => {
-    const string = `${e
-      .toDate()
-      .getHours()}:${e.toDate().getMinutes()}:${e.toDate().getSeconds()}`;
-    setTime(string);
-  };
-
-  const updateImage = (newImages) => {
-    setImage(newImages);
+  const updateImage = (newImage) => {
+    console.log("New image:", newImage);
+    setImage(newImage);
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(categoryId, subcategoryId, description, basePrice, date, time);
+
+    // Se agrupan los valores recopilados del form
+    const body = {
+      sellerAlias,
+      subcategoryId,
+      description,
+      basePrice,
+      date,
+      time,
+      image,
+      deliveryDetails,
+    };
+    console.log(
+      sellerAlias,
+      subcategoryId,
+      description,
+      basePrice,
+      date,
+      time,
+      image,
+      deliveryDetails
+    );
     // Validar
+    if (
+      ![
+        sellerAlias,
+        subcategoryId,
+        description,
+        basePrice,
+        date,
+        time,
+        image,
+        deliveryDetails,
+      ].every(Boolean)
+    ) {
+      // Mandar
+      const response = await fetch(
+        "http://localhost:5000/dashboard/addAuction",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+    } else {
+      alert("Debe llenar todos los campos");
+    }
   };
 
   // Opciones de los dropdown menu
@@ -138,6 +172,10 @@ const CreateAuctionView = (setAuth) => {
                 <Button>Seleccione la categoría</Button>
               </Dropdown>
             </tr>
+            <tr>
+              {" "}
+              <label>Usted seleccionó: {categoryId}</label>{" "}
+            </tr>
           </td>
           <td>
             <tr>
@@ -148,11 +186,14 @@ const CreateAuctionView = (setAuth) => {
                 <Button>Seleccione la subcategoría</Button>
               </Dropdown>
             </tr>
+            <tr>
+              <label>Usted seleccionó: {subcategoryId}</label>
+            </tr>
           </td>
         </table>
         <br />
         <br />
-        <label>Descripción</label>
+        <label>Descripción del item</label>
         <TextArea
           name="descripcion"
           onChange={(e) => setDescription(e.target.value)}
@@ -197,6 +238,13 @@ const CreateAuctionView = (setAuth) => {
           onChange={(e) => setTimeState(e)}
           value={time}
         /> */}
+        <br />
+        <br />
+        <label>Detalles de entrega</label>
+        <TextArea
+          onChange={(e) => setDeliveryDetails(e.target.value)}
+          value={deliveryDetails}
+        />
         <br />
         <br />
         <Button style={{ width: "100%" }} onClick={onSubmit}>

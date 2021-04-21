@@ -61,4 +61,46 @@ router.post("/getSubcategories", async (req, res) => {
   }
 });
 
+// Método para agregar una subasta
+router.post("/addAuction", async (req, res) => {
+  // Se desestructura el body
+  const {
+    sellerAlias,
+    subcategoryId,
+    description,
+    basePrice,
+    date,
+    time,
+    image,
+  } = req.body;
+
+  const datetime = date + time;
+
+  // Se hace la llamada a la base de datos
+  const client = await pool.connect();
+  console.log("Adding auction");
+  try {
+    const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
+    const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
+    const itemId = await client.query(createItemQuery, [
+      subcategoryId,
+      basePrice,
+      description,
+      image,
+    ]);
+
+    const response = await client.query(createAuctionText, [
+      itemId,
+      sellerAlias,
+      datetime,
+      description,
+    ]);
+
+    res.json("Subasta agregada correctamente");
+  } catch (err) {
+    console.error("ERORR ADDING THE AUCTION", err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
 module.exports = router;
