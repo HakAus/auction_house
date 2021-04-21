@@ -55,7 +55,7 @@ const Dashboard = ({ setAuth }) => {
           {view === "category_view" && userType === "participante" ? (
             <CategoryView />
           ) : view === "create_auction_view" && userType === "participante" ? (
-            <CreateAuctionView alias={alias} />
+            <CreateAuctionView sellerAlias={alias} />
           ) : view === "register_user_view" && userType === "administrador" ? (
             <RegisterUserView />
           ) : (

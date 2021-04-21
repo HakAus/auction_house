@@ -72,9 +72,10 @@ router.post("/addAuction", async (req, res) => {
     date,
     time,
     image,
+    deliveryDetails,
   } = req.body;
 
-  const datetime = date + time;
+  const datetime = date + " " + time;
 
   // Se hace la llamada a la base de datos
   const client = await pool.connect();
@@ -89,11 +90,19 @@ router.post("/addAuction", async (req, res) => {
       image,
     ]);
 
-    const response = await client.query(createAuctionText, [
-      itemId,
+    console.log(
+      "Para meter en crear subastas: ",
+      itemId.rows[0].crear_item,
       sellerAlias,
       datetime,
-      description,
+      deliveryDetails
+    );
+
+    const response = await client.query(createAuctionText, [
+      itemId.rows[0].crear_item,
+      sellerAlias,
+      datetime,
+      deliveryDetails,
     ]);
 
     res.json("Subasta agregada correctamente");
