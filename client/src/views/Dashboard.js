@@ -11,6 +11,7 @@ import UserAuctsView from "./UserAuctsView";
 
 const Dashboard = ({ setAuth }) => {
   const [alias, setAlias] = useState("");
+  const [userId,setUserId] = useState(0);
   const [userType, setUserType] = useState("");
   const [view, setView] = useState("");
   const [Subasta,setSubasta] = useState("")
@@ -34,8 +35,9 @@ const Dashboard = ({ setAuth }) => {
       });
 
       const parseResponse = await response.json();
-
+      console.log(parseResponse)
       setAlias(parseResponse.alias);
+      setUserId(parseResponse.cedula);
       setUserType(parseResponse.tipousuario);
     } catch (err) {
       console.error(err.message);
@@ -78,7 +80,8 @@ const Dashboard = ({ setAuth }) => {
             <RegisterUserView />
           ) : view === "auct_history" && userType === "participante" ?(
             <AuctHistoryView 
-             Subasta = {Subasta}/>
+             Subasta = {Subasta}
+             userId = {userId}/>
           ) : view === "user_list" && userType === "participante" ?(
               <UserListView 
               setAuctList = {setAuctList}/>

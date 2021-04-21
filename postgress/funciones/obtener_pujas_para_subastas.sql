@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION obtener_pujas_para_subastas(IN p_id_subasta INT)
-RETURNS TABLE (p_id_ofertante INT, p_monto DECIMAL(9,2), p_fecha_tiempo TIMESTAMP, p_ganadora INT) AS
+RETURNS TABLE (p_ifOferta INT,p_id_ofertante INT, p_monto DECIMAL(9,2), p_fecha_tiempo TIMESTAMP, p_ganadora INT) AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT O.IdOfertante, O.Monto, O.FechaTiempo, O.Ganadora
+        SELECT O.idOferta,O.IdOfertante, O.Monto, O.FechaTiempo, O.Ganadora
         FROM Ofertas O
         WHERE O.IdSubasta = p_id_subasta;
 END;
@@ -14,7 +14,7 @@ $$ LANGUAGE plpgsql
 
 ALTER FUNCTION obtener_pujas_para_subastas(INT) SET SCHEMA casa_subastas_schema;
 
-ALTER FUNCTION obtener_pujas_para_subastas(INT) OWNER TO app;
+ALTER TABLE obtener_pujas_para_subastas(INT) OWNER TO app;
 
 GRANT EXECUTE ON FUNCTION obtener_pujas_para_subastas TO administrador_subastas;
 

@@ -24,7 +24,6 @@ router.post("/", async (req, res) => {
     const queryText = "SELECT * FROM obtener_subastas()";
     const procedure = await client.query(queryText);
     res.json(procedure.rows);
-    console.log(procedure.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
@@ -119,12 +118,32 @@ router.post("/addAuction", async (req, res) => {
 
 //Tiene el nombre mal, tiene que ser verPujas
 router.post("/verSubastas", authorization, async (req, res) => {
+  const { idsubasta } = req.body;
   const client = await pool.connect();
   console.log("Getting bids");
   try {
-    const { idsubasta } = req.body;
-    const queryText = "SELECT * FROM obtener_pujas_para_subastas($1)";
+    console.log(req.body)
+    const queryText = "select * from obtener_pujas_para_subastas($1)";
     const procedure = await client.query(queryText, [idsubasta]);
+    res.json(procedure.rows);
+    console.log(procedure.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
+//Este metodo es para ofertar en una subasta
+router.post("/ofertar", authorization, async (req, res) => {
+  const { monto,
+          idusuario,
+          idsubasta } = req.body;
+  const client = await pool.connect();
+  console.log("Getting bids");
+  try {
+    console.log(req.body)
+    const queryText = "select * from crear_puja($1 ,$2 ,$3)";
+    const procedure = await client.query(queryText, [monto,idusuario,idsubasta]);
     res.json(procedure.rows);
     console.log(procedure.rows);
   } catch (err) {
@@ -139,6 +158,7 @@ router.post("/verSubastasUsuario", authorization, async (req, res) => {
   console.log("Getting users");
   try {
     const { cedula } = req.body;
+    console.log(req.body)
     const queryText = "SELECT * FROM obtener_pujas_usuario($1)"; //Todo:Definir el procedimiento almacenado
     const procedure = await client.query(queryText, [cedula]);
     res.json(procedure.rows);
