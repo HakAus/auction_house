@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-const AuctHistoryView = ({Subasta,userId}) => {
+const AuctHistoryView = ({Subasta}) => {
 
   const [inputs, setInputs] = useState({
-    monto: ""
+    monto: 0
   });
   const {
     monto
@@ -14,10 +14,8 @@ const AuctHistoryView = ({Subasta,userId}) => {
 
     const [History,setHistory] = useState([])
 
-    async function getHistory(){
+    const getHistory = async () =>{
       const body = {idsubasta};
-      console.log(body)
-      console.log(userId)
         try {
           return fetch("http://localhost:5000/dashboard/verSubastas", {
             method: "POST",
@@ -35,17 +33,22 @@ const AuctHistoryView = ({Subasta,userId}) => {
 
       }
 
-      const bid = (e) =>{
+      const onClick = (e) =>{
+        if(monto < 5000)
+          console.log("Oferta minima 5000")
+        else
+          bid();
+      }
+
+      const bid = async () =>{
+        const body = {monto,
+          idsubasta};
         try {
-          const body = {monto,
-                        userId,
-                        idsubasta};
-          console.log(body)
           return fetch("http://localhost:5000/dashboard/ofertar", {
             method: "POST",
-            headers: {'Content-Type': 'application/json'},
+            headers: {token: localStorage.token ,'Content-Type': 'application/json'},
             body: JSON.stringify(body)
-          }).then(data => data.json());
+          });
         } catch (err) {
           console.error(err.message);
           
@@ -63,7 +66,7 @@ const AuctHistoryView = ({Subasta,userId}) => {
             if(mounted) {
                 setHistory(items)
             }
-          })
+          });
         return () => mounted = false;
       }, [])
 
@@ -74,6 +77,21 @@ const AuctHistoryView = ({Subasta,userId}) => {
                 <h1>History</h1>
             </div>
             <br />
+            <input
+          type="number"
+          name="monto"
+          placeholder="monto"
+          className="form-control my-3"
+          value={monto}
+          onChange={(e) => onChange(e)}
+          />
+          <button
+            type="fetch-button"
+            class="btn btn-light mx-2"
+            onClick={(e)=>onClick(e)}
+          >
+            Pujar
+          </button>
 
             <table>
                 <thead>
@@ -86,22 +104,7 @@ const AuctHistoryView = ({Subasta,userId}) => {
                 </thead>
                 
        
-         <input
-          type="number"
-          name="monto"
-          placeholder="monto"
-          className="form-control my-3"
-          value={monto}
-          onChange={(e) => onChange(e)}
-          />
-          {console.log(History)}
-          <button
-            type="button"
-            class="btn btn-light mx-2"
-            onClick={()=>bid()}
-          >
-            Pujar
-          </button>
+
 
 
                 {History.length !==0?//Tengo que traer el idOferta?

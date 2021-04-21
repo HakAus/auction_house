@@ -35,7 +35,6 @@ const Dashboard = ({ setAuth }) => {
       });
 
       const parseResponse = await response.json();
-      console.log(parseResponse)
       setAlias(parseResponse.alias);
       setUserId(parseResponse.cedula);
       setUserType(parseResponse.tipousuario);
@@ -80,8 +79,7 @@ const Dashboard = ({ setAuth }) => {
             <RegisterUserView />
           ) : view === "auct_history" && userType === "participante" ?(
             <AuctHistoryView 
-             Subasta = {Subasta}
-             userId = {userId}/>
+             Subasta = {Subasta}/>
           ) : view === "user_list" && userType === "participante" ?(
               <UserListView 
               setAuctList = {setAuctList}/>

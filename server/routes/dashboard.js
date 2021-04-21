@@ -17,7 +17,7 @@ router.get("/", authorization, async (req, res) => {
 });
 
 //Metodo para traer todos los items que estan en la base de datos
-router.post("/", async (req, res) => {
+router.post("/",authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting products");
   try {
@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
 });
 
 // Método para traer las categorías
-router.post("/getCategories", async (req, res) => {
+router.post("/getCategories",authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting categories");
   try {
@@ -46,7 +46,7 @@ router.post("/getCategories", async (req, res) => {
 });
 
 // Método para traer las subcategorías
-router.post("/getSubcategories", async (req, res) => {
+router.post("/getSubcategories",authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting subcategories");
   try {
@@ -122,11 +122,9 @@ router.post("/verSubastas", authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting bids");
   try {
-    console.log(req.body)
     const queryText = "select * from obtener_pujas_para_subastas($1)";
     const procedure = await client.query(queryText, [idsubasta]);
     res.json(procedure.rows);
-    console.log(procedure.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
@@ -134,18 +132,25 @@ router.post("/verSubastas", authorization, async (req, res) => {
 });
 
 //Este metodo es para ofertar en una subasta
-router.post("/ofertar", authorization, async (req, res) => {
+router.post("/ofertar",authorization, async (req, res) => {//No puedo sacar la autenticacion
   const { monto,
-          idusuario,
           idsubasta } = req.body;
   const client = await pool.connect();
-  console.log("Getting bids");
+  console.log("Bidding");
   try {
-    console.log(req.body)
-    const queryText = "select * from crear_puja($1 ,$2 ,$3)";
-    const procedure = await client.query(queryText, [monto,idusuario,idsubasta]);
-    res.json(procedure.rows);
-    console.log(procedure.rows);
+    const checkQuerry = "select * from obtener_maxima_puja($1)";
+    const queryText = "call crear_puja($1 ,$2 ,$3,0)";
+    await client.query("BEGIN")
+    const maxPrice = await client.query(checkQuerry, [idsubasta]);//Que pasa con 0 ofertas?
+    const maxBid = Number(maxPrice.rows[0].obtener_maxima_puja);
+    if(maxBid + maxBid*0.5 < monto){
+      const procedure = await client.query(queryText, [monto,req.user,idsubasta]);
+      res.json(procedure.rows);
+    }
+    else{
+      res.json("Su oferta es menor al x% de la oferta mas alta")
+    }
+    await client.query("END")
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");

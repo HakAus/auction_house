@@ -5,7 +5,8 @@ BEGIN
     RETURN QUERY
         SELECT O.idOferta,O.IdOfertante, O.Monto, O.FechaTiempo, O.Ganadora
         FROM Ofertas O
-        WHERE O.IdSubasta = p_id_subasta;
+        WHERE O.IdSubasta = p_id_subasta
+        ORDER BY O.FechaTiempo DESC;
 END;
 $$ LANGUAGE plpgsql
  SECURITY DEFINER
@@ -14,7 +15,7 @@ $$ LANGUAGE plpgsql
 
 ALTER FUNCTION obtener_pujas_para_subastas(INT) SET SCHEMA casa_subastas_schema;
 
-ALTER TABLE obtener_pujas_para_subastas(INT) OWNER TO app;
+ALTER FUNCTION obtener_pujas_para_subastas(INT) OWNER TO app;
 
 GRANT EXECUTE ON FUNCTION obtener_pujas_para_subastas TO administrador_subastas;
 

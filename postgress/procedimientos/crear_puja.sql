@@ -8,7 +8,10 @@ CREATE OR REPLACE PROCEDURE crear_puja
 )
 AS
 $$
+DECLARE
+    maxPrice int;
 BEGIN
+    maxPrice := Max(monto) from Ofertas where IdSubasta = p_id_subasta;
     INSERT INTO Ofertas(IdSubasta,IdOfertante,monto,fechatiempo,ganadora) --Considerar que necesito retornar
     VALUES (p_id_subasta,p_id_usuario,p_monto,CURRENT_TIMESTAMP(2),0);
 END;
@@ -24,3 +27,5 @@ ALTER PROCEDURE crear_puja(DECIMAL(9,2),int,int,int) OWNER TO app;
 --GRANT EXECUTE ON PROCEDURE crear_puja TO administrador_subastas;
 
 GRANT EXECUTE ON PROCEDURE crear_puja TO participante_subastas;
+
+
