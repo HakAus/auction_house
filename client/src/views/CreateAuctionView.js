@@ -1,5 +1,5 @@
 // Componentes propios
-import CategoriesModal from "../components/CateogorySelectors";
+import UploadImage from "../components/UploadImage";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -22,7 +22,7 @@ const CreateAuctionView = ({ sellerAlias }) => {
   // Hooks
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  const [categoryId, setCategoryId] = useState(0);
+  // const [categoryId, setCategoryId] = useState(0);
   const [subcategoryId, setSubcategoryId] = useState(0);
   const [description, setDescription] = useState("");
   const [deliveryDetails, setDeliveryDetails] = useState("");
@@ -73,7 +73,6 @@ const CreateAuctionView = ({ sellerAlias }) => {
   // Functions
 
   const updateImage = (newImage) => {
-    console.log("New image:", newImage);
     setImage(newImage);
   };
 
@@ -81,74 +80,56 @@ const CreateAuctionView = ({ sellerAlias }) => {
     e.preventDefault();
 
     // Se agrupan los valores recopilados del form
-    const body = {
-      sellerAlias,
-      subcategoryId,
-      description,
-      basePrice,
-      date,
-      time,
-      image,
-      deliveryDetails,
-    };
-    console.log(
-      sellerAlias,
-      subcategoryId,
-      description,
-      basePrice,
-      date,
-      time,
-      image,
-      deliveryDetails
-    );
+    // const body = {
+    //   sellerAlias,
+    //   subcategoryId,
+    //   description,
+    //   basePrice,
+    //   date,
+    //   time,
+    //   // image,
+    //   deliveryDetails,
+    // };
+    const formData = new FormData();
+    formData.append("sellerAlias", sellerAlias);
+    formData.append("subcategoryId", subcategoryId);
+    formData.append("description", description);
+    formData.append("basePrice", basePrice);
+    formData.append("date", date);
+    formData.append("time", time);
+    formData.append("image", image);
+    formData.append("deliveryDetails", deliveryDetails);
+
     // Validar
     if (
-      ![
-        sellerAlias,
-        subcategoryId,
-        description,
-        basePrice,
-        date,
-        time,
-        image,
-        deliveryDetails,
-      ].every(Boolean)
+      // ![
+      //   sellerAlias,
+      //   subcategoryId,
+      //   description,
+      //   basePrice,
+      //   date,
+      //   time,
+      //   image,
+      //   deliveryDetails,
+      // ].every(Boolean)
+      true
     ) {
       // Mandar
       const response = await fetch(
         "http://localhost:5000/dashboard/addAuction",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          headers: {
+            token: localStorage.token,
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
         }
       );
     } else {
       alert("Debe llenar todos los campos");
     }
   };
-
-  // Opciones de los dropdown menu
-  const opcionesCategoria = (
-    <Menu onClick={(e) => setCategoryId(e.key)}>
-      {categories.map((item) => (
-        <Menu.Item key={item.id} value={item.id}>
-          {item.nombre}
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
-
-  const opcionesSubcategoria = (
-    <Menu onClick={(e) => setSubcategoryId(e.key)}>
-      {subcategories.map((item) => (
-        <Menu.Item key={item.id} value={item.id}>
-          {" "}
-          {item.nombre}
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
 
   // JSX
   return (
@@ -161,7 +142,8 @@ const CreateAuctionView = ({ sellerAlias }) => {
       </div>
       <Form onSubmit={onSubmit}>
         {/* DropZone */}
-        <FileUpload refreshFunction={updateImage} />
+        <UploadImage updateImage={updateImage} />
+        {/* <FileUpload refreshFunction={updateImage} /> */}
         {/* Seleccionadores de categoria y subcategoria */}
         <br />
         <br />

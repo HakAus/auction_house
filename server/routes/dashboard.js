@@ -17,7 +17,7 @@ router.get("/", authorization, async (req, res) => {
 });
 
 //Metodo para traer todos los items que estan en la base de datos
-router.post("/", async (req, res) => {
+router.post("/", authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting products");
   try {
@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
 });
 
 // Método para traer las categorías
-router.post("/getCategories", async (req, res) => {
+router.post("/getCategories", authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting categories");
   try {
@@ -47,7 +47,7 @@ router.post("/getCategories", async (req, res) => {
 });
 
 // Método para traer las subcategorías
-router.post("/getSubcategories", async (req, res) => {
+router.post("/getSubcategories", authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting subcategories");
   try {
@@ -62,59 +62,72 @@ router.post("/getSubcategories", async (req, res) => {
 });
 
 // Método para agregar una subasta
-router.post("/addAuction", async (req, res) => {
+router.post("/addAuction", authorization, async (req, res) => {
   // Se desestructura el body
-  const {
-    sellerAlias,
-    subcategoryId,
-    description,
-    basePrice,
-    date,
-    time,
-    image,
-    deliveryDetails,
-  } = req.body;
+  // const {
+  //   sellerAlias,
+  //   subcategoryId,
+  //   description,
+  //   basePrice,
+  //   date,
+  //   time,
+  //   image,
+  //   deliveryDetails,
+  // } = req.body;
 
-  const datetime = date + " " + time;
+  console.log(
+    "Imprimiendo desde el otro lado, en el server. Mae esto fue lo que me llegó: ",
+    req
+  );
 
-  // Se hace la llamada a la base de datos
-  const client = await pool.connect();
-  console.log("Adding auction");
-  try {
-    const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
-    const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
+  // const datetime = date + " " + time;
 
-    const itemId = await client.query(createItemQuery, [
-      subcategoryId,
-      basePrice,
-      description,
-      image,
-    ]);
+  // // Se hace la llamada a la base de datos
+  // const client = await pool.connect();
+  // console.log("Adding auction");
+  // console.log("image data:", image);
+  // try {
+  //   const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
+  //   const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
 
-    await client.query("BEGIN");
+  //   console.log(
+  //     "Para meter en crear item:",
+  //     subcategoryId,
+  //     basePrice,
+  //     description,
+  //     image
+  //   );
+  //   const itemId = await client.query(createItemQuery, [
+  //     subcategoryId,
+  //     basePrice,
+  //     description,
+  //     image,
+  //   ]);
 
-    console.log(
-      "Para meter en crear subastas: ",
-      itemId.rows[0].crear_item,
-      sellerAlias,
-      datetime,
-      deliveryDetails
-    );
+  //   await client.query("BEGIN");
 
-    await client.query(createAuctionText, [
-      itemId.rows[0].crear_item,
-      sellerAlias,
-      datetime,
-      deliveryDetails,
-    ]);
+  //   console.log(
+  //     "Para meter en crear subastas: ",
+  //     itemId.rows[0].crear_item,
+  //     sellerAlias,
+  //     datetime,
+  //     deliveryDetails
+  //   );
 
-    await client.query("END;");
+  //   await client.query(createAuctionText, [
+  //     itemId.rows[0].crear_item,
+  //     sellerAlias,
+  //     datetime,
+  //     deliveryDetails,
+  //   ]);
 
-    res.json("Subasta agregada correctamente");
-  } catch (err) {
-    console.error("ERORR ADDING THE AUCTION", err.message);
-    res.status(500).send("Error en el servidor");
-  }
+  //   await client.query("END;");
+
+  //   res.json("Subasta agregada correctamente");
+  // } catch (err) {
+  //   console.error("ERORR ADDING THE AUCTION", err.message);
+  //   res.status(500).send("Error en el servidor");
+  // }
 });
 
 //Tiene el nombre mal, tiene que ser verPujas
