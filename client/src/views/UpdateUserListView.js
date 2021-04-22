@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
+
+// Componentes propios
+import UpdateUserView from "./UpdateUserView";
+
 //Creo que me hacen falta las validaciones de autenticcion
-const UserListView = ({ setAuctList }) => {
+const UpdateUserListView = ({ setUpdateUserView }) => {
   const [UserList, setUserList] = useState([]);
 
   async function getUserList() {
@@ -13,9 +17,8 @@ const UserListView = ({ setAuctList }) => {
       console.error(err.message);
     }
   }
-  const getAucts = (e, item) => {
-    console.log("JUEPUTA");
-    setAuctList(e, item);
+  const goToUserUpdateView = (item) => {
+    setUpdateUserView(item);
   };
 
   useEffect(() => {
@@ -31,7 +34,7 @@ const UserListView = ({ setAuctList }) => {
   return (
     <div style={{ width: "80%", margin: "3rem auto" }}>
       <div style={{ textAlign: "center" }}>
-        <h1>History</h1>
+        <h1>Actualización de usuario</h1>
       </div>
       <br />
 
@@ -42,20 +45,24 @@ const UserListView = ({ setAuctList }) => {
             <th>Alias</th>
             <th>Correo</th>
             <th>Tipo de Usuario</th>
-            <th>Numero de ventas</th>
-            <th>Numero de compras</th>
           </tr>
         </thead>
 
         <tbody>
           {UserList.map((item) => (
-            <tr key={item.cedula} onClick={(e) => getAucts(e, item)}>
+            <tr key={item.cedula} onClick={() => goToUserUpdateView(item)}>
               <td>{item.cedula}</td>
               <td>{item.alias}</td>
               <td>{item.correo}</td>
-              <td>{"QUE TIPO SOY?"}</td>
-              <td>{0}</td>
-              <td>{0}</td>
+              <td>{item.tipousuario}</td>
+              <button
+                type="button"
+                class="btn btn-warning"
+                data-toggle="modal"
+                data-target={`#id${item.cedula}`}
+              >
+                Edit
+              </button>
             </tr>
           ))}
         </tbody>
@@ -64,4 +71,4 @@ const UserListView = ({ setAuctList }) => {
   );
 };
 
-export default UserListView;
+export default UpdateUserListView;

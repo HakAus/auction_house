@@ -8,31 +8,41 @@ import RegisterUserView from "./RegisterUserView";
 import AuctHistoryView from "./AuctHistoryView";
 import UserListView from "./UserListView";
 import UserAuctsView from "./UserAuctsView";
+import UpdateUserView from "./UpdateUserView";
+import UpdateUserListView from "./UpdateUserListView";
 
 const Dashboard = ({ setAuth }) => {
   const [alias, setAlias] = useState("");
-  const [userId,setUserId] = useState(0);
+  const [userId, setUserId] = useState(0);
   const [userType, setUserType] = useState("");
   const [view, setView] = useState("");
-  const [Subasta,setSubasta] = useState("")
-  const [Usuario,setUsuario] = useState("")
+  const [Subasta, setSubasta] = useState("");
+  const [Usuario, setUsuario] = useState("");
 
-  const getAuctData = (e,Subasta) => {
-    setSubasta(Subasta)
-    setView("auct_history")
-  }
+  const getAuctData = (e, Subasta) => {
+    setSubasta(Subasta);
+    setView("auct_history");
+  };
 
-  const setAuctList = (e,fetchedId) =>{
-    setUsuario(fetchedId)
-    setView("user_auct_list")
-  }
+  const setAuctList = (e, user) => {
+    setUsuario(user);
+    setView("user_auct_list");
+  };
+
+  const setUpdateUserView = (user) => {
+    setUsuario(user);
+    setView("update_user_view");
+  };
 
   async function getUserData() {
     try {
-      const response = await fetch("http://localhost:5000/dashboard/", {
-        method: "GET",
-        headers: { token: localStorage.token },
-      });
+      const response = await fetch(
+        "http://localhost:5000/dashboard/obtenerInfoUsuario",
+        {
+          method: "GET",
+          headers: { token: localStorage.token },
+        }
+      );
 
       const parseResponse = await response.json();
       setAlias(parseResponse.alias);
@@ -49,13 +59,13 @@ const Dashboard = ({ setAuth }) => {
     // Se elimina el token asignado.
     localStorage.removeItem("token");
     // Se actualiza la autorización a falso.
+    console.log("Cerrando sesión ...");
     setAuth(false);
   };
 
   useEffect(() => {
     getUserData();
   }, []);
-
 
   return (
     <Fragment>
@@ -70,23 +80,20 @@ const Dashboard = ({ setAuth }) => {
       <body>
         <div>
           {view === "category_view" && userType === "participante" ? (
-            <CategoryView 
-              getAuctData={getAuctData}
-            />
+            <CategoryView getAuctData={getAuctData} />
           ) : view === "create_auction_view" && userType === "participante" ? (
             <CreateAuctionView sellerAlias={alias} />
           ) : view === "register_user_view" && userType === "administrador" ? (
             <RegisterUserView />
-          ) : view === "auct_history" && userType === "participante" ?(
-            <AuctHistoryView 
-             Subasta = {Subasta}/>
-          ) : view === "user_list" && userType === "participante" ?(
-              <UserListView 
-              setAuctList = {setAuctList}/>
-            ): view === "user_auct_list" && userType === "participante" ?(
-              <UserAuctsView 
-              Usuario = {Usuario}/>
-            ):(
+          ) : view === "auct_history" && userType === "participante" ? (
+            <AuctHistoryView Subasta={Subasta} />
+          ) : view === "user_list" && userType === "participante" ? (
+            <UserListView setAuctList={setAuctList} />
+          ) : view === "user_auct_list" && userType === "participante" ? (
+            <UserAuctsView Usuario={Usuario} />
+          ) : view === "update_user_view" && userType === "administrador" ? (
+            <UpdateUserListView setUpdateUserView={setUpdateUserView} />
+          ) : (
             <div></div>
           )}
         </div>

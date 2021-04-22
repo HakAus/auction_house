@@ -15,6 +15,7 @@ const registerUser = async (
   segundo_apellido,
   direccion,
   correo,
+  telefonos,
   estado
 ) => {
   // Sentencias de las bases de datos.
@@ -32,6 +33,7 @@ const registerUser = async (
   else client = await oracledb.getConnection();
   try {
     if (database === "pg") {
+      await client.query("BEGIN");
       result = await client.query(pgQuery, [
         cedula,
         tipo_usuario,
@@ -44,7 +46,15 @@ const registerUser = async (
         correo,
         estado,
       ]);
+      for (let i = 0; i < telefonos.length; i++) {
+        await client.query("call agregar_telefono($1,$2)", [
+          cedula,
+          telefonos[i],
+        ]);
+      }
+      await client.query("END;");
     } else {
+      // AGREGAR TELEFONOS EN ORACLE
       result = await client.execute(
         oracleQuery,
         {
@@ -62,7 +72,7 @@ const registerUser = async (
         { autoCommit: true }
       );
     }
-    // console.log(result);
+
     // Se retorna el estado del procedimiento
     return database === "pg"
       ? result.rows[0].p_estado

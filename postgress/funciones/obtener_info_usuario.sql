@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION obtener_info_usuario(IN _cedula INT)
-RETURNS TABLE (Alias VARCHAR(20), TipoUsuario VARCHAR(50)) AS
+RETURNS TABLE (Alias VARCHAR(20), TipoUsuario VARCHAR(50), ) AS
 $$
 BEGIN
     RETURN QUERY

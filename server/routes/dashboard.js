@@ -2,14 +2,21 @@ const router = require("express").Router();
 const pool = require("../pg_database");
 const authorization = require("../middleware/authorization");
 
-router.get("/", authorization, async (req, res) => {
+router.get("/obtenerInfoUsuario", authorization, async (req, res) => {
   const client = await pool.connect();
   try {
     // Del middleware "authorization" obtenemos el id del usuario validado (la cedula)
 
     const queryText = "SELECT * FROM obtener_info_usuario($1)";
     const procedure = await client.query(queryText, [req.user]);
-    res.json(procedure.rows[0]);
+    console.log(procedure);
+    const response = {
+      cedula: req.user,
+      alias: procedure.rows[0].alias,
+      tipousuario: procedure.rows[0].tipousuario,
+    };
+    console.log(response);
+    res.json(response);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
@@ -194,10 +201,47 @@ router.post("/listaUsuarios", authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting users");
   try {
-    const queryText = "SELECT * FROM obtener_usuarios()"; //Todo:Definir el procedimiento almacenado
+    const queryText = "SELECT * FROM obtener_usuarios()";
     const procedure = await client.query(queryText);
     res.json(procedure.rows);
     console.log(procedure.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
+router.post("/actualizarUsuario", authorization, async (req, res) => {
+  const {
+    tipo_usuario,
+    alias,
+    contrasena,
+    nombre,
+    primer_apellido,
+    segundo_apellido,
+    direccion,
+    correo,
+  } = req.body;
+  const estado = 0;
+
+  const client = await pool.connect();
+  console.log("Updating user");
+  try {
+    const queryText =
+      "call actualizar_usuario($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
+    const procedure = await client.query(queryText, [
+      tipo_usuario,
+      alias,
+      contrasena,
+      nombre,
+      primer_apellido,
+      segundo_apellido,
+      direccion,
+      correo,
+      estado,
+    ]);
+    res.json(procedure.rows[0]);
+    console.log(procedure.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");

@@ -1,13 +1,15 @@
 SELECT * FROM Usuarios
 
-DROP FUNCTION obtener_usuarios
+DROP FUNCTION obtener_usuarios;
 
 CREATE OR REPLACE FUNCTION obtener_usuarios()
-RETURNS TABLE (cedula int,alias varchar,correo varchar) AS
+RETURNS TABLE (cedula int, alias varchar, correo varchar, tipousuario varchar) AS
 $$
 BEGIN
     RETURN QUERY
-		SELECT U.cedula,U.alias,U.correo FROM Usuarios U;
+		SELECT U.cedula,U.alias,U.correo, TU.Nombre FROM Usuarios U
+    INNER JOIN TiposUsuarios TU ON TU.IdTipo = U.IdTipo
+    ORDER BY U.alias;
 END;
 $$ LANGUAGE plpgsql
  SECURITY DEFINER

@@ -1,4 +1,4 @@
-const AdminNavBarOptions = ({ setView, alias, logout }) => {
+const AdminNavBarOptions = ({ setView, logout }) => {
   return (
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav mr-auto">
@@ -11,6 +11,15 @@ const AdminNavBarOptions = ({ setView, alias, logout }) => {
             Registrar usuario
           </button>
         </li>
+        <li class="nav-item">
+          <button
+            type="button"
+            class="btn btn-light mx-2"
+            onClick={() => setView("update_user_view")}
+          >
+            Actualizar usuario
+          </button>
+        </li>
         <li>
           <button className="btn btn-primary mx-2" onClick={(e) => logout(e)}>
             Cerrar sesión
@@ -21,7 +30,7 @@ const AdminNavBarOptions = ({ setView, alias, logout }) => {
   );
 };
 
-const ParticipanteNavBarOptions = ({ setView, alias, logout }) => {
+const ParticipanteNavBarOptions = ({ setView, logout }) => {
   return (
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav mr-auto">

@@ -1,6 +1,6 @@
--- Procedimiento que registra a un nuevo usuario. Retorna una variable _estado con 1 si es exitoso o un código de error si no.
+-- Procedimiento que actualiza a un usuario. Retorna una variable _estado con 1 si es exitoso o un código de error si no.
 
-CREATE OR REPLACE PROCEDURE registrar_usuario
+CREATE OR REPLACE PROCEDURE actualizar_usuario
 (
     IN p_cedula INT,
     IN p_nombre_tipo_usuario VARCHAR(50),
@@ -25,8 +25,16 @@ BEGIN
     WHERE TU.Nombre = p_nombre_tipo_usuario;
 
     IF id_tipo_usuario <> 0 THEN
-        INSERT INTO Usuarios
-        VALUES (p_cedula, id_tipo_usuario, p_alias, p_contrasena, p_nombre, p_primer_apellido, p_segundo_apellido, p_direccion, p_correo);
+        UPDATE Usuarios
+        SET IdTipo = id_tipo_usuario, 
+            Alias = p_alias, 
+            Contrasena = p_contrasena, 
+            Nombre = p_nombre, 
+            PrimerApellido = p_primer_apellido, 
+            SegundoApellido = p_segundo_apellido, 
+            Direccion = p_direccion, 
+            Correo = p_correo
+        WHERE Cedula = p_cedula;
         p_estado := 1;   -- 1 significa exito
     ELSE
         p_estado := -1;  -- -1 significa que el tipo de usuario no existe.
@@ -60,15 +68,8 @@ SECURITY DEFINER
     SET search_path = casa_subastas_schema, pg_temp;
 
 
--- select 
---  * 
--- from information_schema.role_table_grants 
--- where grantee='participante_subastas'
--- ;
+ALTER PROCEDURE actualizar_usuario(int,int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) SET SCHEMA casa_subastas_schema;
 
+ALTER PROCEDURE actualizar_usuario(int,int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) OWNER TO app;
 
-ALTER PROCEDURE registrar_usuario(int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) SET SCHEMA casa_subastas_schema;
-
-ALTER PROCEDURE registrar_usuario(int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) OWNER TO app;
-
-GRANT EXECUTE ON PROCEDURE registrar_usuario TO administrador_subastas;
+GRANT EXECUTE ON PROCEDURE actualizar_usuario TO administrador_subastas;

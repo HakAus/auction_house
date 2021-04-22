@@ -1,8 +1,6 @@
 import React, { Fragment, useState } from "react";
 
-import PhoneNumberList from "../components/PhoneNumberList";
-
-const RegisterUserView = ({ setAuth }) => {
+const UpdateUserView = () => {
   const [inputs, setInputs] = useState({
     cedula: "",
     tipo_usuario: "administrador",
@@ -14,20 +12,6 @@ const RegisterUserView = ({ setAuth }) => {
     direccion: "",
     correo: "",
   });
-
-  const [telefonos, setTelefonos] = useState([]);
-
-  const addPhone = (phone) => {
-    if (!telefonos.includes(phone)) {
-      setTelefonos([...telefonos, phone]);
-    } else {
-      alert("Número repetido");
-    }
-  };
-
-  const removePhone = (phone) => {
-    setTelefonos(telefonos.filter((p) => p !== phone));
-  };
 
   const {
     cedula,
@@ -58,21 +42,13 @@ const RegisterUserView = ({ setAuth }) => {
         segundo_apellido,
         direccion,
         correo,
-        telefonos,
       };
 
-      const response = await fetch("http://localhost:5000/auth/register", {
+      await fetch("http://localhost:5000/auth/actualizarUsuario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
-      const parseResponse = await response.json();
-
-      // Se guarda el token del usuario
-      localStorage.setItem("token", parseResponse.token);
-      // Se valida el acceso
-      setAuth(true);
     } catch (err) {
       console.error(err.message);
     }
@@ -80,18 +56,8 @@ const RegisterUserView = ({ setAuth }) => {
 
   return (
     <Fragment>
-      <h1 className="text-center my-5">Registro de usuario</h1>
+      <h1 className="text-center my-5">Actualización de usuario</h1>
       <form onSubmit={onSubmitForm}>
-        <input
-          type="text"
-          name="cedula"
-          placeholder="Cédula"
-          className="form-control my-3"
-          value={cedula}
-          onChange={(e) => onChange(e)}
-          required
-        />
-
         <label>
           <input
             type="radio"
@@ -181,15 +147,10 @@ const RegisterUserView = ({ setAuth }) => {
           onChange={(e) => onChange(e)}
           required
         />
-        <PhoneNumberList
-          telefonos={telefonos}
-          addPhone={addPhone}
-          removePhone={removePhone}
-        />
-        <button className="btn btn-success btn-block mt-3">Registrar</button>
+        <button className="btn btn-success btn-block">Actualizar</button>
       </form>
     </Fragment>
   );
 };
 
-export default RegisterUserView;
+export default UpdateUserView;

@@ -54,6 +54,7 @@ router.post("/register", validInfo, async (req, res) => {
       segundo_apellido,
       direccion,
       correo,
+      telefonos,
       estado,
     } = req.body;
 
@@ -70,6 +71,7 @@ router.post("/register", validInfo, async (req, res) => {
       segundo_apellido,
       direccion,
       correo,
+      telefonos,
       estado
     );
 
