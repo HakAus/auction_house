@@ -1,5 +1,7 @@
 import React, { Fragment, useState } from "react";
 
+import PhoneNumberList from "../components/PhoneNumberList";
+
 const UpdateUserView = ({ user, returnToUserUpdateList }) => {
   const [inputs, setInputs] = useState({
     cedula: user.cedula,
@@ -12,6 +14,20 @@ const UpdateUserView = ({ user, returnToUserUpdateList }) => {
     direccion: user.direccion,
     correo: user.correo,
   });
+
+  const [telefonos, setTelefonos] = useState(user.telefonos);
+
+  const addPhone = (phone) => {
+    if (!telefonos.includes(phone)) {
+      setTelefonos([...telefonos, phone]);
+    } else {
+      alert("Número repetido");
+    }
+  };
+
+  const removePhone = (phone) => {
+    setTelefonos(telefonos.filter((p) => p !== phone));
+  };
 
   const {
     cedula,
@@ -43,6 +59,7 @@ const UpdateUserView = ({ user, returnToUserUpdateList }) => {
         segundo_apellido,
         direccion,
         correo,
+        telefonos,
       };
 
       console.log("se va a actualizar con estos datos:", body);
@@ -159,6 +176,11 @@ const UpdateUserView = ({ user, returnToUserUpdateList }) => {
           value={correo}
           onChange={(e) => onChange(e)}
           required
+        />
+        <PhoneNumberList
+          telefonos={telefonos}
+          addPhone={addPhone}
+          removePhone={removePhone}
         />
         <button className="btn btn-success btn-block" onClick={onSubmitForm}>
           Actualizar
