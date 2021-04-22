@@ -1,16 +1,16 @@
 import React, { Fragment, useState } from "react";
 
-const UpdateUserView = () => {
+const UpdateUserView = ({ user, returnToUserUpdateList }) => {
   const [inputs, setInputs] = useState({
-    cedula: "",
-    tipo_usuario: "administrador",
-    alias: "",
-    contrasena: "",
-    nombre: "",
-    primer_apellido: "",
-    segundo_apellido: "",
-    direccion: "",
-    correo: "",
+    cedula: user.cedula,
+    tipo_usuario: user.tipousuario,
+    alias: user.alias,
+    contrasena: user.contrasena,
+    nombre: user.nombre,
+    primer_apellido: user.primerapellido,
+    segundo_apellido: user.segundoapellido,
+    direccion: user.direccion,
+    correo: user.correo,
   });
 
   const {
@@ -26,6 +26,7 @@ const UpdateUserView = () => {
   } = inputs;
 
   const onChange = (e) => {
+    console.log(user);
     setInputs({ ...inputs, [e.target.name]: e.target.value });
   };
 
@@ -44,9 +45,13 @@ const UpdateUserView = () => {
         correo,
       };
 
-      await fetch("http://localhost:5000/auth/actualizarUsuario", {
+      console.log("se va a actualizar con estos datos:", body);
+      await fetch("http://localhost:5000/dashboard/actualizarUsuario", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          token: localStorage.token,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(body),
       });
     } catch (err) {
@@ -56,6 +61,14 @@ const UpdateUserView = () => {
 
   return (
     <Fragment>
+      <div style={{ justifyContent: "left", marginTop: 20 }}>
+        <button
+          className="btn btn-primary"
+          onClick={() => returnToUserUpdateList()}
+        >
+          Regresar
+        </button>
+      </div>
       <h1 className="text-center my-5">Actualización de usuario</h1>
       <form onSubmit={onSubmitForm}>
         <label>
@@ -93,7 +106,7 @@ const UpdateUserView = () => {
           required
         />
         <input
-          type="password"
+          type="text"
           name="contrasena"
           placeholder="Contraseña"
           className="form-control my-3"
@@ -147,7 +160,9 @@ const UpdateUserView = () => {
           onChange={(e) => onChange(e)}
           required
         />
-        <button className="btn btn-success btn-block">Actualizar</button>
+        <button className="btn btn-success btn-block" onClick={onSubmitForm}>
+          Actualizar
+        </button>
       </form>
     </Fragment>
   );

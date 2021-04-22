@@ -34,10 +34,14 @@ const Dashboard = ({ setAuth }) => {
     setView("update_user_view");
   };
 
+  const returnToUserUpdateList = () => {
+    setView("update_user_list_view");
+  };
+
   async function getUserData() {
     try {
       const response = await fetch(
-        "http://localhost:5000/dashboard/obtenerInfoUsuario",
+        "http://localhost:5000/dashboard/obtenerAliasTipoUsuario",
         {
           method: "GET",
           headers: { token: localStorage.token },
@@ -91,8 +95,14 @@ const Dashboard = ({ setAuth }) => {
             <UserListView setAuctList={setAuctList} />
           ) : view === "user_auct_list" && userType === "participante" ? (
             <UserAuctsView Usuario={Usuario} />
-          ) : view === "update_user_view" && userType === "administrador" ? (
+          ) : view === "update_user_list_view" &&
+            userType === "administrador" ? (
             <UpdateUserListView setUpdateUserView={setUpdateUserView} />
+          ) : view === "update_user_view" && userType == "administrador" ? (
+            <UpdateUserView
+              user={Usuario}
+              returnToUserUpdateList={returnToUserUpdateList}
+            />
           ) : (
             <div></div>
           )}

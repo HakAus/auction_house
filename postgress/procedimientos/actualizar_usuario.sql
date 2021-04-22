@@ -25,7 +25,7 @@ BEGIN
     WHERE TU.Nombre = p_nombre_tipo_usuario;
 
     IF id_tipo_usuario <> 0 THEN
-        UPDATE Usuarios
+        UPDATE Usuarios U
         SET IdTipo = id_tipo_usuario, 
             Alias = p_alias, 
             Contrasena = p_contrasena, 
@@ -68,8 +68,8 @@ SECURITY DEFINER
     SET search_path = casa_subastas_schema, pg_temp;
 
 
-ALTER PROCEDURE actualizar_usuario(int,int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) SET SCHEMA casa_subastas_schema;
+ALTER PROCEDURE actualizar_usuario(int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) SET SCHEMA casa_subastas_schema;
 
-ALTER PROCEDURE actualizar_usuario(int,int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) OWNER TO app;
+ALTER PROCEDURE actualizar_usuario(int,varchar,varchar,varchar,varchar,varchar,varchar,varchar,varchar,int) OWNER TO app;
 
 GRANT EXECUTE ON PROCEDURE actualizar_usuario TO administrador_subastas;

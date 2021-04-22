@@ -11,15 +11,37 @@ const UpdateUserListView = ({ setUpdateUserView }) => {
     try {
       return fetch("http://localhost:5000/dashboard/listaUsuarios", {
         method: "POST",
-        headers: { token: localStorage.token },
+        headers: {
+          token: localStorage.token,
+          "Content-Type": "application/json",
+        },
       }).then((data) => data.json());
     } catch (err) {
       console.error(err.message);
     }
   }
-  const goToUserUpdateView = (item) => {
-    setUpdateUserView(item);
-  };
+
+  async function getUserData(cedula) {
+    try {
+      const body = { cedula };
+      const response = await fetch(
+        "http://localhost:5000/dashboard/obtenerInfoCompletaUsuario",
+        {
+          method: "POST",
+          headers: {
+            token: localStorage.token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      const userData = await response.json();
+      userData.cedula = cedula; // se le agrega la cédula para saber a quien actualizar
+      setUpdateUserView(userData);
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -37,7 +59,6 @@ const UpdateUserListView = ({ setUpdateUserView }) => {
         <h1>Actualización de usuario</h1>
       </div>
       <br />
-
       <table class="table mt-5 text-center">
         <thead>
           <tr>
@@ -49,8 +70,9 @@ const UpdateUserListView = ({ setUpdateUserView }) => {
         </thead>
 
         <tbody>
-          {UserList.map((item) => (
-            <tr key={item.cedula} onClick={() => goToUserUpdateView(item)}>
+          {UserList.map((item, index) => (
+            // onClick={() => goToUserUpdateView(item)}
+            <tr key={index}>
               <td>{item.cedula}</td>
               <td>{item.alias}</td>
               <td>{item.correo}</td>
@@ -58,8 +80,7 @@ const UpdateUserListView = ({ setUpdateUserView }) => {
               <button
                 type="button"
                 class="btn btn-warning"
-                data-toggle="modal"
-                data-target={`#id${item.cedula}`}
+                onClick={() => getUserData(item.cedula)}
               >
                 Edit
               </button>

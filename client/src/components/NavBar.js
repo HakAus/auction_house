@@ -15,7 +15,7 @@ const AdminNavBarOptions = ({ setView, logout }) => {
           <button
             type="button"
             class="btn btn-light mx-2"
-            onClick={() => setView("update_user_view")}
+            onClick={() => setView("update_user_list_view")}
           >
             Actualizar usuario
           </button>
