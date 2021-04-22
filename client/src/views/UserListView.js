@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-//Creo que me hacen falta las validaciones de autenticcion
+import SearchFeature from "../components/SearchFeature";
+
+
 const UserListView = ({setAuctList}) => {
   
       const [UserList,setUserList] = useState([])
@@ -16,10 +18,13 @@ const UserListView = ({setAuctList}) => {
             
           }
         }
-    const getAucts= (e,item) =>{
-        console.log("JUEPUTA")
-        setAuctList(e,item)
+    const getAucts= (e,item,modo) =>{
+      setAuctList(e,item,modo)
     }
+
+    const updateSearchTerms = (newSearchTerm) => {
+
+    };
   
       useEffect(() => {
           let mounted = true;
@@ -38,29 +43,37 @@ const UserListView = ({setAuctList}) => {
                   <h1>History</h1>
               </div>
               <br />
-  
-              <table>
+   <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          margin: "1rem auto",
+        }}
+      >
+        <SearchFeature refreshFunction={updateSearchTerms} />
+      </div>
+              <table class="table mt-5 text-center">
                   <thead>
                       <tr>
                           <th>Id Usuario</th>
                           <th>Alias</th>
                           <th>Correo</th>
                           <th>Tipo de Usuario</th>
-                          <th>Numero de ventas</th>
-                          <th>Numero de compras</th>
+                          <th>Ventas</th>
+                          <th>Compras</th>
                       </tr>
                   </thead>
   
                   
                   <tbody>
                       {UserList.map(item => (
-                              <tr key = {item.cedula} onClick = {(e) => getAucts(e,item)}>
+                              <tr key = {item.cedula} >
                                   <td>{item.cedula}</td>
                                   <td>{item.alias}</td>
                                   <td>{item.correo}</td>
                                   <td>{"QUE TIPO SOY?"}</td>
-                                  <td>{0}</td>
-                                  <td>{0}</td>
+                                  <td><button onClick = {(e) => getAucts(e,item,"venta")} type="button" class="btn btn-warning">Ventas</button></td>
+                                  <td><button onClick = {(e) => getAucts(e,item,"compra")} type="button" class="btn btn-danger">Compras</button></td>
                               </tr>
                           ))}
                   </tbody>

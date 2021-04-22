@@ -17,7 +17,7 @@ router.get("/", authorization, async (req, res) => {
 });
 
 //Metodo para traer todos los items que estan en la base de datos
-router.post("/",authorization, async (req, res) => {
+router.post("/getProducts",authorization, async (req, res) => {
   const client = await pool.connect();
   console.log("Getting products");
   try {
@@ -141,7 +141,7 @@ router.post("/ofertar",authorization, async (req, res) => {//No puedo sacar la a
     const checkQuerry = "select * from obtener_maxima_puja($1)";
     const queryText = "call crear_puja($1 ,$2 ,$3,0)";
     await client.query("BEGIN")
-    const maxPrice = await client.query(checkQuerry, [idsubasta]);//Que pasa con 0 ofertas?
+    const maxPrice = await client.query(checkQuerry, [idsubasta]);
     const maxBid = Number(maxPrice.rows[0].obtener_maxima_puja);
     console.log(maxBid)
     if(maxBid + maxBid*0.5 < monto){
@@ -159,16 +159,32 @@ router.post("/ofertar",authorization, async (req, res) => {//No puedo sacar la a
 });
 
 //Este es para ver los usuarios
-router.post("/verSubastasUsuario", authorization, async (req, res) => {
+router.post("/verVentasUsuario", authorization, async (req, res) => {
   const client = await pool.connect();
-  console.log("Getting users");
+  console.log("Getting seller aucts");
   try {
     const { cedula } = req.body;
     console.log(req.body)
-    const queryText = "SELECT * FROM obtener_pujas_usuario($1)"; //Todo:Definir el procedimiento almacenado
+    console.log(cedula)
+    const queryText = "SELECT * FROM obtener_subastas_vendedor($1)";
     const procedure = await client.query(queryText, [cedula]);
     res.json(procedure.rows);
-    console.log(procedure.rows);
+    console.log(procedure.rows)
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
+router.post("/verComprasUsuario", authorization, async (req, res) => {
+  const client = await pool.connect();
+  console.log("Getting buyer aucts");
+  try {
+    const { cedula } = req.body;
+    const queryText = "SELECT * FROM obtener_ventas_por_comprador($1)";
+    const procedure = await client.query(queryText, [cedula]);
+    res.json(procedure.rows);
+    console.log(procedure.rows)
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");

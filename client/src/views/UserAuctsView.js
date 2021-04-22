@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const UserAuctsView = ({Usuario}) => {
+const UserAuctsView = ({Usuario,Modo}) => {
   
       const [History,setHistory] = useState([])
   
@@ -9,10 +9,17 @@ const UserAuctsView = ({Usuario}) => {
           try {
             const body = {cedula:Usuario.cedula};
             console.log(Usuario)
+            console.log(Modo)
             console.log(body)
-            return fetch("http://localhost:5000/dashboard/verSubastasUsuario", {
+            var url
+            if(Modo === 'compra')
+              url = "http://localhost:5000/dashboard/verComprasUsuario"
+            else
+              url = "http://localhost:5000/dashboard/verVentasUsuario"
+            const urlPetition = url
+            return fetch(urlPetition, {
               method: "POST",
-              headers: { token: localStorage.token },
+              headers: { token: localStorage.token ,'Content-Type': 'application/json'},
               body: JSON.stringify(body)
             }).then(data => data.json());
           } catch (err) {
@@ -40,25 +47,22 @@ const UserAuctsView = ({Usuario}) => {
               </div>
               <br />
   
-              <table>
+              <table class="table mt-5 text-center">
                   <thead>
                       <tr>
-                          <th>Id Usuario</th>
-                          <th>Alias</th>
-                          <th>Correo</th>
-                          <th>Numero de ventas</th>
-                          <th>Numero de compras</th>
+                          <th>Id Subasta</th>
+                          <th>Fecha de Cierre</th>
+                          <th>Item</th>
                       </tr>
                   </thead>
-  
+                  {console.log(History)}
                   {History.length !==0?
                   <tbody>
                       {History.map(item => (
                               <tr key={item.idsubasta}>
-                                  <td>{item.id}</td>
-                                  <td>{item.price}</td>
-                                  <td>{item.quantity}</td>
-                                  <td>{item.dateOfPurchase}</td>
+                                  <td>{item.idsubasta}</td>
+                                  <td>{item.fechahoracierre}</td>
+                                  <td>{item.descripcionitem}</td>
                               </tr>
                           ))}
                   </tbody>

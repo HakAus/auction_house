@@ -33,11 +33,12 @@ const AuctHistoryView = ({Subasta}) => {
 
       }
 
-      const onClick = (e) =>{
+       const onClick = async (e) =>{
         if(monto < 5000)
           console.log("Oferta minima 5000")
-        else
+        else{
           bid();
+        }
       }
 
       const bid = async () =>{
@@ -93,7 +94,7 @@ const AuctHistoryView = ({Subasta}) => {
             Pujar
           </button>
 
-            <table>
+            <table class="table mt-5 text-center">
                 <thead>
                     <tr>
                         <th>Id Oferta</th>

@@ -16,14 +16,16 @@ const Dashboard = ({ setAuth }) => {
   const [view, setView] = useState("");
   const [Subasta,setSubasta] = useState("")
   const [Usuario,setUsuario] = useState("")
+  const [Modo,setModo] = useState("")
 
   const getAuctData = (e,Subasta) => {
     setSubasta(Subasta)
     setView("auct_history")
   }
 
-  const setAuctList = (e,fetchedId) =>{
+  const setAuctList = (e,fetchedId,modo) =>{
     setUsuario(fetchedId)
+    setModo(modo)
     setView("user_auct_list")
   }
 
@@ -85,7 +87,9 @@ const Dashboard = ({ setAuth }) => {
               setAuctList = {setAuctList}/>
             ): view === "user_auct_list" && userType === "participante" ?(
               <UserAuctsView 
-              Usuario = {Usuario}/>
+              Usuario = {Usuario}
+              Modo = {Modo}/>
+              
             ):(
             <div></div>
           )}
