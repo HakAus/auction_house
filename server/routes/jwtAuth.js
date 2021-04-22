@@ -4,6 +4,7 @@ const { connectDatabase, registerUser } = require("../database");
 const jwtGenerator = require("../utils/jwtGenerator");
 const validInfo = require("../middleware/validinfo");
 const authorization = require("../middleware/authorization");
+const oracledb = require("oracledb");
 
 // Error handling
 const registerErrorHandler = (state, response) => {
@@ -91,18 +92,48 @@ router.post("/register", validInfo, async (req, res) => {
 
 // Login
 router.post("/login", validInfo, async (req, res) => {
-  const client = await pg_pool.connect();
-  try {
+  let client;
+  let procedure;
+  database = "oracle"//TODO:Cambios aca
+  try{
+  if(database === "pg")
+    client = await pg_pool.connect();
+  else
+    client = await oracledb.getConnection();
     // 1. Desestrcuturar req.body (alias, contraseña)
     const { alias, contrasena, tipo_usuario } = req.body;
 
     // 2. Se ejecuta el procedimiento de login
     const queryText = "SELECT * FROM verificar_usuario($1, $2, $3)";
-    const procedure = await client.query(queryText, [
+    const oracleQuery = 'BEGIN  casa_subastas.verificar_usuario(:p_alias,:p_contrasena,:p_tipo_usuario,:ret);  END;'
+    let options 
+    if(database === "pg"){
+      procedure = await client.query(queryText, [
       alias,
       contrasena,
       tipo_usuario,
     ]);
+    }
+    else{
+      oracleProcedure = await client.execute(oracleQuery, {
+      p_alias:alias,
+      p_contrasena:contrasena,
+      p_tipo_usuario:tipo_usuario,
+      ret:{type: oracledb.CURSOR, dir: oracledb.BIND_OUT}
+      });
+      const resultSet = oracleProcedure.outBinds.ret;
+      console.log(resultSet)
+      //Clase para que coincida con postgres
+      class rowa{constructor(_cedula,_estado){this._cedula = _cedula;this._estado = _estado}}
+      procedure = {rows:[]}
+      let row;
+      while ((row = await resultSet.getRow())) {
+        procedure.rows.push(new rowa(row[0],row[1]))
+      }
+
+      // always close the ResultSet
+      await resultSet.close();
+    }
 
     if (procedure.rows[0]._estado !== 1) {
       loginErrorHandler(procedure.rows[0]._estado, res);
