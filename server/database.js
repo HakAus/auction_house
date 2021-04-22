@@ -29,10 +29,10 @@ const registerUser = async (
   let client;
 
   // Ejecución de la consulta.
-  if (database === "pg") client = await pg_pool.connect();
+  if (database === process.env.POSTGRES) client = await pg_pool.connect();
   else client = await oracledb.getConnection();
   try {
-    if (database === "pg") {
+    if (database === process.env.POSTGRES) {
       await client.query("BEGIN");
       result = await client.query(pgQuery, [
         cedula,
@@ -74,14 +74,14 @@ const registerUser = async (
     }
 
     // Se retorna el estado del procedimiento
-    return database === "pg"
+    return database === process.env.POSTGRES
       ? result.rows[0].p_estado
       : result.outBinds.p_estado;
   } catch (err) {
     console.error(err.message);
   } finally {
     // Se libera el cliente del pool respectivo
-    if (database === "pg") {
+    if (database === process.env.POSTGRES) {
       client.release();
     } else {
       client.close();

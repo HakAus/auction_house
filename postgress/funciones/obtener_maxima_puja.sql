@@ -5,7 +5,7 @@ DECLARE
     maxPrice NUMERIC;
 BEGIN
     SELECT INTO maxPrice Max(monto) from Ofertas where IdSubasta = p_id_subasta;
-    RETURN maxPrice;
+	RETURN maxPrice;
 END;
 $$ LANGUAGE plpgsql
  SECURITY DEFINER

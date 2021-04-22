@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 
-const Login = ({ setAuth }) => {
+const Login = ({ db, setAuth }) => {
   const [inputs, setInputs] = useState({
     alias: "",
     contrasena: "",
@@ -15,9 +15,11 @@ const Login = ({ setAuth }) => {
   };
 
   const onSubmitForm = async (e) => {
+    console.log("ESTA ES LA BASE MAE:", db);
     e.preventDefault(); // Evita que se refresque la página, que es el comportamiento por defecto.
     try {
       const body = {
+        db,
         alias,
         contrasena,
         tipo_usuario,

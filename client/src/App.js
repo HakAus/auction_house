@@ -14,9 +14,11 @@ import Dashboard from "./views/Dashboard";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UploadItem from "./components/UploadItem";
+import DatabaseSelectionView from "./views/DatabaseSelectionView";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [database, setDatabase] = useState("");
 
   const setAuth = (boolean) => {
     setIsAuthenticated(boolean);
@@ -50,10 +52,21 @@ function App() {
             <Switch>
               <Route
                 exact
+                path="/selectDatabase"
+                render={(props) =>
+                  database === "" ? (
+                    <DatabaseSelectionView setDatabase={setDatabase} />
+                  ) : (
+                    <Redirect to="/login" />
+                  )
+                }
+              ></Route>
+              <Route
+                exact
                 path="/login"
                 render={(props) =>
                   !isAuthenticated ? (
-                    <Login {...props} setAuth={setAuth} />
+                    <Login {...props} db={database} setAuth={setAuth} />
                   ) : (
                     <Redirect to="/dashboard" />
                   )
@@ -80,11 +93,6 @@ function App() {
                     <Redirect to="/login" />
                   )
                 }
-              ></Route>
-              <Route
-                exact
-                path="/uploadSubasta"
-                render={(props) => <UploadItem {...props} />}
               ></Route>
             </Switch>
           </div>

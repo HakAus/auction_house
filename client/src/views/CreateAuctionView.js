@@ -2,17 +2,7 @@
 import UploadImage from "../components/UploadImage";
 
 import React, { useEffect, useState } from "react";
-import {
-  Menu,
-  Dropdown,
-  TimePicker,
-  DatePicker,
-  Modal,
-  Typography,
-  Button,
-  Form,
-  Input,
-} from "antd";
+import { Typography, Button, Form, Input } from "antd";
 import FileUpload from "../components/FileUpload";
 import CategorySelectors from "../components/CateogorySelectors";
 const { Title } = Typography;

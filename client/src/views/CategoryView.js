@@ -11,9 +11,12 @@ const { Meta } = Card;
 const CategoriyView = ({ getAuctData }) => {
   async function getProducts() {
     try {
-      return fetch("http://localhost:5000/dashboard", {
+      return fetch("http://localhost:5000/dashboard/getProducts", {
         method: "POST",
-        headers: { token: localStorage.token },
+        headers: {
+          token: localStorage.token,
+          "Content-Type": "application/json",
+        },
       }).then((data) => data.json());
     } catch (err) {
       console.error(err.message);

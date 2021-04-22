@@ -4,6 +4,10 @@ const { connectDatabase, registerUser } = require("../database");
 const jwtGenerator = require("../utils/jwtGenerator");
 const validInfo = require("../middleware/validinfo");
 const authorization = require("../middleware/authorization");
+const oracledb = require("oracledb");
+
+// Global database variable
+let database = "";
 
 // Error handling
 const registerErrorHandler = (state, response) => {
@@ -44,7 +48,6 @@ router.post("/register", validInfo, async (req, res) => {
   try {
     // 1. Desestrcuturar req.body (alias, contraseña)
     const {
-      // base_de_datos,
       cedula,
       tipo_usuario,
       alias,
@@ -61,7 +64,7 @@ router.post("/register", validInfo, async (req, res) => {
     // 2. Se hace el registro del usuario en la base de datos por medio de una tranasacción.
 
     const procedure_status = await registerUser(
-      /*base_de_datos,*/ "pg",
+      database,
       cedula,
       tipo_usuario,
       alias,
@@ -93,18 +96,59 @@ router.post("/register", validInfo, async (req, res) => {
 
 // Login
 router.post("/login", validInfo, async (req, res) => {
-  const client = await pg_pool.connect();
+  let client;
+  let procedure;
+
+  // 1. Desestrcuturar req.body (alias, contraseña)
+  const { db, alias, contrasena, tipo_usuario } = req.body;
+
+  // Se selecciona la base de datos
+  database = db;
   try {
-    // 1. Desestrcuturar req.body (alias, contraseña)
-    const { alias, contrasena, tipo_usuario } = req.body;
+    if (database === process.env.POSTGRES) {
+      client = await pg_pool.connect();
+      console.log("login con postgres");
+    } else {
+      client = await oracledb.getConnection();
+      console.log("login con oracle");
+    }
 
     // 2. Se ejecuta el procedimiento de login
     const queryText = "SELECT * FROM verificar_usuario($1, $2, $3)";
-    const procedure = await client.query(queryText, [
-      alias,
-      contrasena,
-      tipo_usuario,
-    ]);
+    const oracleQuery =
+      "BEGIN  casa_subastas.verificar_usuario(:p_alias,:p_contrasena,:p_tipo_usuario,:ret);  END;";
+
+    if (database === process.env.POSTGRES) {
+      procedure = await client.query(queryText, [
+        alias,
+        contrasena,
+        tipo_usuario,
+      ]);
+    } else {
+      const oracleProcedure = await client.execute(oracleQuery, {
+        p_alias: alias,
+        p_contrasena: contrasena,
+        p_tipo_usuario: tipo_usuario,
+        ret: { type: oracledb.CURSOR, dir: oracledb.BIND_OUT },
+      });
+      const resultSet = oracleProcedure.outBinds.ret;
+      console.log(resultSet);
+      //Clase para que coincida con postgres
+      class rowa {
+        constructor(_cedula, _estado) {
+          this._cedula = _cedula;
+          this._estado = _estado;
+        }
+      }
+      procedure = { rows: [] };
+      let row;
+      while ((row = await resultSet.getRow())) {
+        procedure.rows.push(new rowa(row[0], row[1]));
+      }
+
+      // always close the ResultSet
+      await resultSet.close();
+    }
 
     if (procedure.rows[0]._estado !== 1) {
       loginErrorHandler(procedure.rows[0]._estado, res);
@@ -122,6 +166,7 @@ router.post("/login", validInfo, async (req, res) => {
   }
 });
 
+// Validat el token
 router.get("/is-verified", authorization, async (req, res) => {
   try {
     res.json(true);
@@ -130,5 +175,17 @@ router.get("/is-verified", authorization, async (req, res) => {
     res.status(500).send("Error en el servidor");
   }
 });
+
+// Seleccionar la base de datos
+// router.get("/selectDatabase", async (req, res) => {
+//   try {
+//     console.log("LA BASE ES: ", req.database);
+//     database = req.database;
+//     res.json(`${database} was selected`);
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send("Error en el servidor");
+//   }
+// });
 
 module.exports = router;

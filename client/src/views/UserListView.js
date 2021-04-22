@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-//Creo que me hacen falta las validaciones de autenticcion
+import SearchFeature from "../components/SearchFeature";
+
 const UserListView = ({ setAuctList }) => {
   const [UserList, setUserList] = useState([]);
 
@@ -17,6 +18,8 @@ const UserListView = ({ setAuctList }) => {
     setAuctList(e, item, modo);
   };
 
+  const updateSearchTerms = (newSearchTerm) => {};
+
   useEffect(() => {
     let mounted = true;
     getUserList().then((items) => {
@@ -33,7 +36,15 @@ const UserListView = ({ setAuctList }) => {
         <h1>History</h1>
       </div>
       <br />
-
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          margin: "1rem auto",
+        }}
+      >
+        <SearchFeature refreshFunction={updateSearchTerms} />
+      </div>
       <table class="table mt-5 text-center">
         <thead>
           <tr>
@@ -41,14 +52,14 @@ const UserListView = ({ setAuctList }) => {
             <th>Alias</th>
             <th>Correo</th>
             <th>Tipo de Usuario</th>
-            <th>Numero de ventas</th>
-            <th>Numero de compras</th>
+            <th>Ventas</th>
+            <th>Compras</th>
           </tr>
         </thead>
 
         <tbody>
           {UserList.map((item) => (
-            <tr key={item.cedula} onClick={(e) => getAucts(e, item)}>
+            <tr key={item.cedula}>
               <td>{item.cedula}</td>
               <td>{item.alias}</td>
               <td>{item.correo}</td>
