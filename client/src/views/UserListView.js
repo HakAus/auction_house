@@ -13,9 +13,8 @@ const UserListView = ({ setAuctList }) => {
       console.error(err.message);
     }
   }
-  const getAucts = (e, item) => {
-    console.log("JUEPUTA");
-    setAuctList(e, item);
+  const getAucts = (e, item, modo) => {
+    setAuctList(e, item, modo);
   };
 
   useEffect(() => {
@@ -54,8 +53,24 @@ const UserListView = ({ setAuctList }) => {
               <td>{item.alias}</td>
               <td>{item.correo}</td>
               <td>{"QUE TIPO SOY?"}</td>
-              <td>{0}</td>
-              <td>{0}</td>
+              <td>
+                <button
+                  onClick={(e) => getAucts(e, item, "venta")}
+                  type="button"
+                  class="btn btn-warning"
+                >
+                  Ventas
+                </button>
+              </td>
+              <td>
+                <button
+                  onClick={(e) => getAucts(e, item, "compra")}
+                  type="button"
+                  class="btn btn-danger"
+                >
+                  Compras
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
