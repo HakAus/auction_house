@@ -46,7 +46,6 @@ router.post("/obtenerInfoCompletaUsuario", authorization, async (req, res) => {
     }
     user_info.rows[0].telefonos = phoneNumbers;
     await client.query("END;");
-    console.log("INFO PA ACTUALIZAR:", user_info.rows[0]);
     res.json(user_info.rows[0]);
   } catch (err) {
     console.error(err.message);
@@ -109,57 +108,59 @@ router.post("/getSubcategories", authorization, async (req, res) => {
 // Método para agregar una subasta
 router.post("/addAuction", authorization, async (req, res) => {
   // Se desestructura el body
-  // const {
-  //   sellerAlias,
-  //   subcategoryId,
-  //   description,
-  //   basePrice,
-  //   date,
-  //   time,
-  //   image,
-  //   deliveryDetails,
-  // } = req.body;
-  // const datetime = date + " " + time;
-  // // Se hace la llamada a la base de datos
-  // const client = await pool.connect();
-  // console.log("Adding auction");
-  // console.log("image data:", image);
-  // try {
-  //   const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
-  //   const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
-  //   console.log(
-  //     "Para meter en crear item:",
-  //     subcategoryId,
-  //     basePrice,
-  //     description,
-  //     image
-  //   );
-  //   const itemId = await client.query(createItemQuery, [
-  //     subcategoryId,
-  //     basePrice,
-  //     description,
-  //     image,
-  //   ]);
-  //   await client.query("BEGIN");
-  //   console.log(
-  //     "Para meter en crear subastas: ",
-  //     itemId.rows[0].crear_item,
-  //     sellerAlias,
-  //     datetime,
-  //     deliveryDetails
-  //   );
-  //   await client.query(createAuctionText, [
-  //     itemId.rows[0].crear_item,
-  //     sellerAlias,
-  //     datetime,
-  //     deliveryDetails,
-  //   ]);
-  //   await client.query("END;");
-  //   res.json("Subasta agregada correctamente");
-  // } catch (err) {
-  //   console.error("ERORR ADDING THE AUCTION", err.message);
-  //   res.status(500).send("Error en el servidor");
-  // }
+  const {
+    sellerAlias,
+    subcategoryId,
+    description,
+    basePrice,
+    date,
+    time,
+    image,
+    deliveryDetails,
+  } = req.body;
+  const datetime = date + " " + time;
+  // Se hace la llamada a la base de datos
+  const client = await pool.connect();
+  console.log("Adding auction");
+  console.log("image data:", image);
+  try {
+    const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
+    const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
+    console.log(
+      "Para meter en crear item:",
+      subcategoryId,
+      basePrice,
+      description,
+      image
+    );
+    const itemId = await client.query(createItemQuery, [
+      subcategoryId,
+      basePrice,
+      description,
+      image,
+    ]);
+
+    await client.query("BEGIN");
+    console.log(
+      "Para meter en crear subastas: ",
+      itemId.rows[0].crear_item,
+      sellerAlias,
+      datetime,
+      deliveryDetails
+    );
+    await client.query(createAuctionText, [
+      itemId.rows[0].crear_item,
+      sellerAlias,
+      datetime,
+      deliveryDetails,
+    ]);
+    await client.query("END;");
+
+    res.json("Subasta agregada correctamente");
+  } catch (err) {
+    console.error("ERORR ADDING THE AUCTION", err.message);
+    res.status(500).send("Error en el servidor");
+  }
 });
 
 //Tiene el nombre mal, tiene que ser verPujas
@@ -236,7 +237,7 @@ router.post("/listaUsuarios", authorization, async (req, res) => {
     const queryText = "SELECT * FROM obtener_usuarios()";
     const procedure = await client.query(queryText);
     res.json(procedure.rows);
-    console.log(procedure.rows);
+    // console.log(procedure.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
