@@ -41,7 +41,7 @@ const UserAuctsView = ({ Usuario, Modo }) => {
     <div style={{ width: "80%", margin: "3rem auto" }}>
       <div style={{ textAlign: "center" }}>
         {Modo === "venta" ? (
-          <h1>Historial de ventas</h1>
+          <h1>Historial de subastas</h1>
         ) : (
           <h1>Historial de compras</h1>
         )}

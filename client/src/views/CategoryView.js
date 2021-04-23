@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Row, Card, Col, Result } from "antd";
+import { Row, Card, Col } from "antd";
 import Icon from "@ant-design/icons";
 import CheckBox from "../components/CheckBox";
 import RadioBox from "../components/RadioBox";

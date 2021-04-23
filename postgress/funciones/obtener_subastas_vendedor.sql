@@ -4,12 +4,12 @@ LANGUAGE plpgsql--Que quiero retornar? Formato similar al de las
 AS
 $$
 BEGIN
-    RETURN query
-    SELECT S.idSubasta, S.FechaHoraCierre, I.Descripcion
-    FROM Subastas S
-    INNER JOIN Usuarios U ON U.Cedula = S.IdVendedor
-    INNER JOIN Items I ON I.IdItem = S.IdItemSubastado
-    WHERE S.IdVendedor = p_id_vendedor;
+    RETURN QUERY
+        SELECT S.idSubasta, S.FechaHoraCierre, I.Descripcion
+        FROM Subastas S
+        INNER JOIN Usuarios U ON U.Cedula = S.IdVendedor
+        INNER JOIN Items I ON I.IdItem = S.IdItemSubastado
+        WHERE S.IdVendedor = p_id_vendedor;
 END; $$
 SECURITY DEFINER
     -- Set a secure search_path: trusted schema(s), then 'pg_temp', then pg_catalog to have user-defined names override built-in names

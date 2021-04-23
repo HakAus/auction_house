@@ -41,6 +41,16 @@ const Dashboard = ({ setAuth }) => {
     setView("update_user_list_view");
   };
 
+  const goToSellerHistory = () => {
+    setModo("venta");
+    setView("user_auct_list");
+  };
+
+  const goToBuyerHistory = () => {
+    setModo("compra");
+    setView("user_auct_list");
+  };
+
   async function getUserData() {
     try {
       const response = await fetch(
@@ -52,8 +62,6 @@ const Dashboard = ({ setAuth }) => {
       );
 
       const parseResponse = await response.json();
-      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      console.log(parseResponse);
       setAlias(parseResponse.alias);
       setUserId(parseResponse.cedula);
       setUserType(parseResponse.tipousuario);
@@ -84,6 +92,7 @@ const Dashboard = ({ setAuth }) => {
           alias={alias}
           userType={userType}
           logout={logout}
+          setModo={setModo}
         />
       </header>
       <body>
@@ -95,7 +104,10 @@ const Dashboard = ({ setAuth }) => {
           ) : view === "register_user_view" && userType === "administrador" ? (
             <RegisterUserView />
           ) : view === "auct_history" && userType === "participante" ? (
-            <AuctHistoryView Subasta={Subasta} />
+            <AuctHistoryView
+              Subasta={Subasta}
+              goToSellerHistory={goToSellerHistory}
+            />
           ) : view === "user_list" && userType === "participante" ? (
             <UserListView setAuctList={setAuctList} />
           ) : view === "user_auct_list" && userType === "participante" ? (

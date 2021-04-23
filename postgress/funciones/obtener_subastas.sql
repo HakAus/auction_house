@@ -6,6 +6,7 @@ return query
 	SELECT S.idSubasta, U.Alias, S.fechaHoraCierre,I.idItem,I.precioBase,I.descripcion,I.imagen FROM Subastas S
     INNER JOIN Usuarios U ON U.Cedula = S.IdVendedor
 	INNER JOIN Items I ON I.idItem = iditemsubastado
+    WHERE S.fechaHoraCierre > now()
     ORDER BY S.fechaHoraCierre;
 end; $$
  SECURITY DEFINER

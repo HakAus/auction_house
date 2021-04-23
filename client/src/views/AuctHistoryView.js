@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Descriptions, Badge } from "antd";
+import { Descriptions, Badge, Button, Popover } from "antd";
 
 // Aqui tan las pujas
-const AuctHistoryView = ({ Subasta }) => {
+const AuctHistoryView = ({ Subasta, goToSellerHistory }) => {
   const [inputs, setInputs] = useState({
     monto: 0,
   });
@@ -15,14 +15,17 @@ const AuctHistoryView = ({ Subasta }) => {
   const getHistory = async () => {
     const body = { idsubasta };
     try {
-      return fetch("http://localhost:5000/dashboard/getBids", {
+      const result = await fetch("http://localhost:5000/dashboard/getBids", {
         method: "POST",
         headers: {
           token: localStorage.token,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
-      }).then((data) => data.json());
+      });
+
+      const parseado = await result.json();
+      setHistory(parseado);
     } catch (err) {
       console.error(err.message);
     }
@@ -31,16 +34,14 @@ const AuctHistoryView = ({ Subasta }) => {
   async function getHigherBid() {}
 
   const onClick = async (e) => {
-    if (monto < 5000) alert("Oferta minima 5000");
-    else {
-      bid();
-    }
+    await bid();
+    await getHistory();
   };
 
   const bid = async () => {
     const body = { monto, idsubasta };
     try {
-      return fetch("http://localhost:5000/dashboard/ofertar", {
+      const response = await fetch("http://localhost:5000/dashboard/ofertar", {
         method: "POST",
         headers: {
           token: localStorage.token,
@@ -48,6 +49,11 @@ const AuctHistoryView = ({ Subasta }) => {
         },
         body: JSON.stringify(body),
       });
+
+      const parseResponse = await response.json();
+      if (parseResponse.msg) {
+        alert(parseResponse.msg);
+      }
     } catch (err) {
       console.error(err.message);
     }
@@ -59,15 +65,11 @@ const AuctHistoryView = ({ Subasta }) => {
 
   useEffect(() => {
     let mounted = true;
-    const fechaHora = Subasta.horadecierre.split("T");
-    setFechaSubasta(fechaHora[0]);
-    setHoraSubasta(fechaHora[1].slice(0, -5)); // terror
-    getHistory().then((items) => {
-      if (mounted) {
-        setHistory(items);
-      }
-    });
-    return () => (mounted = false);
+    const fechaHora = new Date(Subasta.horadecierre);
+    console.log("FECHA Y HORA VENIDAS DE LA BASE", fechaHora);
+    setFechaSubasta(fechaHora.toLocaleDateString());
+    setHoraSubasta(fechaHora.toLocaleTimeString()); // terror
+    getHistory();
   }, []);
 
   return (
@@ -96,6 +98,10 @@ const AuctHistoryView = ({ Subasta }) => {
           <Badge status="processing" text="Activa" />
         </Descriptions.Item>
       </Descriptions>
+      <Button style={{ width: "100%" }} onClick={goToSellerHistory}>
+        Ver historial del vendedor
+      </Button>
+      <br />
       <br />
       <div style={{ textAlign: "center" }}>
         <h4>Historial de pujas</h4>
@@ -139,7 +145,7 @@ const AuctHistoryView = ({ Subasta }) => {
           </tbody>
         ) : (
           <tbody>
-            ,<h2> No bids yet...</h2>
+            ,<h2> No hay ofertas aún...</h2>
           </tbody>
         )}
       </table>

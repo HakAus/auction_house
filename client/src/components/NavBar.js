@@ -39,7 +39,7 @@ const AdminNavBarOptions = ({ setView, logout }) => {
   );
 };
 
-const ParticipanteNavBarOptions = ({ setView, logout }) => {
+const ParticipanteNavBarOptions = ({ setView, setModo, logout }) => {
   return (
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav mr-auto">
@@ -49,7 +49,16 @@ const ParticipanteNavBarOptions = ({ setView, logout }) => {
             class="btn btn-light mx-2"
             onClick={() => setView("category_view")}
           >
-            Ver categorías
+            Categorías
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            type="button"
+            class="btn btn-light mx-2"
+            onClick={() => setView("user_list")}
+          >
+            Usuarios
           </button>
         </li>
         <li class="nav-item">
@@ -65,9 +74,24 @@ const ParticipanteNavBarOptions = ({ setView, logout }) => {
           <button
             type="button"
             class="btn btn-light mx-2"
-            onClick={() => setView("user_list")}
+            onClick={() => {
+              setModo("compra");
+              setView("user_auct_list");
+            }}
           >
-            Lista de Usuarios
+            Mis compras
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            type="button"
+            class="btn btn-light mx-2"
+            onClick={() => {
+              setModo("venta");
+              setView("user_auct_list");
+            }}
+          >
+            Mis subastas
           </button>
         </li>
         <li class="nav-item mx-2">
@@ -80,7 +104,7 @@ const ParticipanteNavBarOptions = ({ setView, logout }) => {
   );
 };
 
-const NavBar = ({ setView, alias, userType, logout }) => {
+const NavBar = ({ setView, setModo, alias, userType, logout }) => {
   return (
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark d-flex flex-row">
       <a class="navbar-brand mx-2" href="#">
@@ -102,6 +126,7 @@ const NavBar = ({ setView, alias, userType, logout }) => {
       ) : (
         <ParticipanteNavBarOptions
           setView={setView}
+          setModo={setModo}
           alias={alias}
           logout={logout}
         />

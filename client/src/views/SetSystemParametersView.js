@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input } from "antd";
+import { Button, Input, notification } from "antd";
 
 const SetSystemParametersView = () => {
   const [mejora, setMejora] = useState(0.0);
@@ -57,6 +57,7 @@ const SetSystemParametersView = () => {
       console.log(parseResponse);
     } catch (err) {
       console.error(err.message);
+
       alert(
         "Hubo un error en el servidor al actualizar los parámetros del sistema"
       );

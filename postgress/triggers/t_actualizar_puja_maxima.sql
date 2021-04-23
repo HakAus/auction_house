@@ -13,11 +13,12 @@ BEGIN
     IF id_puja_maxima <> 0 THEN
         UPDATE PujasMaximas
         SET Monto = new.Monto,
+            IdOferta = new.IdOferta,
             IdOfertante = new.IdOfertante
         WHERE IdSubasta = new.IdSubasta;
     ELSE
-        INSERT INTO PujasMaximas (IdSubasta, IdOfertante, Monto)
-        VALUES (new.IdSubasta, new.IdOfertante, new.Monto);
+        INSERT INTO PujasMaximas (IdSubasta, IdOferta, IdOfertante, Monto)
+        VALUES (new.IdSubasta, new.IdOferta, new.IdOfertante, new.Monto);
     END IF;
 
     RETURN new;

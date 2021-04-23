@@ -164,7 +164,6 @@ router.post("/getCategories", authorization, async (req, res) => {
     const queryText = "SELECT * FROM obtener_categorias()";
     const procedure = await client.query(queryText);
     res.json(procedure.rows);
-    console.log(procedure.rows);
   } catch (err) {
     console.error("ERORR GETTING THE CATEGORIES", err.message);
     res.status(500).send("Error en el servidor");
@@ -186,7 +185,6 @@ router.post("/getSubcategories", authorization, async (req, res) => {
     const queryText = "SELECT * FROM obtener_subcategorias()";
     const procedure = await client.query(queryText);
     res.json(procedure.rows);
-    console.log(procedure.rows);
   } catch (err) {
     console.error("ERORR GETTING THE SUBCATEGORIES", err.message);
     res.status(500).send("Error en el servidor");
@@ -338,7 +336,7 @@ router.post("/ofertar", authorization, async (req, res) => {
       ]);
       res.json(procedure.rows);
     } else {
-      res.json("Su oferta es menor al x% de la oferta mas alta");
+      res.json({ msg: "Su oferta es menor al x% de la oferta mas alta" });
     }
     await client.query("END");
   } catch (err) {
