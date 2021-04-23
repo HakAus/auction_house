@@ -10,6 +10,7 @@ import ImageSlider from "../components/ImageSlider.js";
 const { Meta } = Card;
 const CategoriyView = ({ getAuctData }) => {
   async function getProducts() {
+    console.log("Getting products")
     try {
       return fetch("http://localhost:5000/dashboard/getProducts", {
         method: "POST",

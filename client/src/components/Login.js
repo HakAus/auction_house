@@ -29,6 +29,7 @@ const Login = ({ setAuth }) => {
       });
 
       const parseResponse = await response.json();
+      console.log(parseResponse)
 
       // Se guarda el token del usuario
       localStorage.setItem("token", parseResponse.token);

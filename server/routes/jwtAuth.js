@@ -61,7 +61,7 @@ router.post("/register", validInfo, async (req, res) => {
     // 2. Se hace el registro del usuario en la base de datos por medio de una tranasacción.
 
     const procedure_status = await registerUser(
-      /*base_de_datos,*/ "pg",
+      /*base_de_datos,*/ "oracle",
       cedula,
       tipo_usuario,
       alias,
@@ -115,14 +115,13 @@ router.post("/login", validInfo, async (req, res) => {
     ]);
     }
     else{
-      oracleProcedure = await client.execute(oracleQuery, {
+      let oracleProcedure = await client.execute(oracleQuery, {
       p_alias:alias,
       p_contrasena:contrasena,
       p_tipo_usuario:tipo_usuario,
       ret:{type: oracledb.CURSOR, dir: oracledb.BIND_OUT}
       });
       const resultSet = oracleProcedure.outBinds.ret;
-      console.log(resultSet)
       //Clase para que coincida con postgres
       class rowa{constructor(_cedula,_estado){this._cedula = _cedula;this._estado = _estado}}
       procedure = {rows:[]}
@@ -133,6 +132,7 @@ router.post("/login", validInfo, async (req, res) => {
 
       // always close the ResultSet
       await resultSet.close();
+
     }
 
     if (procedure.rows[0]._estado !== 1) {
@@ -149,6 +149,7 @@ router.post("/login", validInfo, async (req, res) => {
   } finally {
     client.release();
   }
+  client.close()
 });
 
 router.get("/is-verified", authorization, async (req, res) => {

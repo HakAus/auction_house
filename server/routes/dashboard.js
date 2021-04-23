@@ -1,28 +1,77 @@
 const router = require("express").Router();
+const oracledb = require("oracledb");
 const pool = require("../pg_database");
 const authorization = require("../middleware/authorization");
+const OracleDB = require("oracledb");
 
 router.get("/", authorization, async (req, res) => {
-  const client = await pool.connect();
-  try {
-    // Del middleware "authorization" obtenemos el id del usuario validado (la cedula)
+  let client
+  database = "oracle"
 
+  try {
+    if(database === "pg")
+    client = await pool.connect();
+  else
+    client =  await oracledb.getConnection();
+    // Del middleware "authorization" obtenemos el id del usuario validado (la cedula)
+    let procedure
     const queryText = "SELECT * FROM obtener_info_usuario($1)";
-    const procedure = await client.query(queryText, [req.user]);
+    const oracleQuery =  'BEGIN  casa_subastas.obtener_info_usuario(:pcedula,:ret);  END;';
+    if(database === "pg")
+      procedure = await client.query(queryText, [req.user]);
+    else{
+        oracleProcedure = await client.execute(oracleQuery,{pcedula:req.user,
+        ret:{type:oracledb.CURSOR,dir:oracledb.BIND_OUT}});
+        const resultSet = oracleProcedure.outBinds.ret;
+        //Clase para que coincida con postgres
+        class rowa{constructor(alias,tipo,cedula){this.alias = alias;this.tipousuario = tipo;this.cedula = cedula}}
+        procedure = {rows:[]}
+        let row;
+        while ((row = await resultSet.getRow())) {
+            procedure.rows.push(new rowa(row[0],row[1],req.user))
+        }
+                                                
+        // always close the ResultSet
+        await resultSet.close();
+      }
     res.json(procedure.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   }
+  client.close();
 });
 
 //Metodo para traer todos los items que estan en la base de datos
 router.post("/getProducts",authorization, async (req, res) => {
-  const client = await pool.connect();
+  database = "oracle"
+  let client
+
   console.log("Getting products");
   try {
+    if(database === "pg")
+    client = await pool.connect();
+    else{
+      client = await oracledb.getConnection();
+    }
     const queryText = "SELECT * FROM obtener_subastas()";
-    const procedure = await client.query(queryText);
+    const oracleQuery = 'BEGIN  casa_subastas.obtener_subastas(:ret);  END;';
+    let procedure
+    if(database === "pg")
+      procedure = await client.query(queryText);
+    else{
+    let oracleProcedure = await client.execute(oracleQuery,{ret:{type: oracledb.CURSOR, dir: oracledb.BIND_OUT}})
+    const resultSet = oracleProcedure.outBinds.ret;
+    class rowa{constructor(idsubcategoria,idsubasta,descripcion,fechaDeCierre,preciobase,imagen,detallesdeentrega){this.idsubcategoria = idsubcategoria;this.idsubasta = idsubasta;this.fechaDeCierre = fechaDeCierre;this.descripcion = descripcion;this.preciobase = preciobase;this.imagen = imagen;this.detallesdeentrega = detallesdeentrega}}
+    procedure = {rows:[]}
+    let row;
+    while ((row = await resultSet.getRow())) {
+      //console.log(row)
+      procedure.rows.push(new rowa(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    }
+    await resultSet.close();//Cierre de conexion y result set
+    client.close();
+    }
     res.json(procedure.rows);
   } catch (err) {
     console.error(err.message);
@@ -117,13 +166,39 @@ router.post("/addAuction", async (req, res) => {
 });
 
 //Tiene el nombre mal, tiene que ser verPujas
+//Trabajando aca
 router.post("/verSubastas", authorization, async (req, res) => {
   const { idsubasta } = req.body;
-  const client = await pool.connect();
+  let client
+  let procedure
+  database = "oracle"
+
   console.log("Getting bids");
   try {
+    if(database === "pg")
+      client = await pool.connect();
+    else
+      client = await oracledb.getConnection();
     const queryText = "select * from obtener_pujas_para_subastas($1)";
-    const procedure = await client.query(queryText, [idsubasta]);
+    const oracleQuery = 'BEGIN  casa_subastas.obtener_pujas_para_subastas(:pidsubasta,:ret);  END;';
+    if(database == "pg")
+      procedure = await client.query(queryText, [idsubasta]);
+    else{
+      console.log(req.body)
+      let oracleProcedure = await client.execute(oracleQuery,{pidsubasta:idsubasta,
+                                                              ret:{type:oracledb.CURSOR,dir:oracledb.BIND_OUT}})
+      const resultSet = oracleProcedure.outBinds.ret;
+      class rowa{constructor(p_ifoferta,p_id_ofertante,p_monto,p_fecha_tiempo){this.p_ifoferta = p_ifoferta;this.p_id_ofertante = p_id_ofertante,this.p_monto = p_monto,this.p_fecha_tiempo = p_fecha_tiempo}}
+      procedure = {rows:[]}
+      console.log(oracleProcedure)
+      let row;
+      while ((row = await resultSet.getRow())) {
+        console.log(row)
+        procedure.rows.push(new rowa(row[0],row[1],row[2],row[3]))
+      }
+      await resultSet.close();
+      client.close()
+    }
     res.json(procedure.rows);
   } catch (err) {
     console.error(err.message);
@@ -192,11 +267,23 @@ router.post("/verComprasUsuario", authorization, async (req, res) => {
 });
 
 router.post("/listaUsuarios", authorization, async (req, res) => {
-  const client = await pool.connect();
+  let client;
+  let procedure;
+  database = "oracle"
   console.log("Getting users");
   try {
+    if(database = "pg")
+      client = await pool.connect();
+    else
+      client = await oracledb.getConnection();
     const queryText = "SELECT * FROM obtener_usuarios()"; //Todo:Definir el procedimiento almacenado
-    const procedure = await client.query(queryText);
+    const oracleQuery = 'BEGIN  casa_subastas.obtener_usuarios(:ret);  END;';
+    if(database = "pg")
+       procedure = await client.query(queryText);
+    else{
+      let oracleProcedure = await client.execute(oracleQuery,{ret:{type:oracledb.CURSOR, dir:oracledb.BIND_OUT}})
+      
+    }
     res.json(procedure.rows);
     console.log(procedure.rows);
   } catch (err) {
