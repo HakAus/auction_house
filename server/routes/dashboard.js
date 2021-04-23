@@ -118,14 +118,16 @@ router.post("/getAuctions", authorization, async (req, res) => {
           idsubcategoria,
           idsubasta,
           descripcion,
-          fechaDeCierre,
+          horadecierre,
           preciobase,
           imagen,
-          detallesdeentrega
+          detallesdeentrega,
+          aliasvendedor
         ) {
+          this.aliasvendedor = aliasvendedor;
           this.idsubcategoria = idsubcategoria;
           this.idsubasta = idsubasta;
-          this.fechaDeCierre = fechaDeCierre;
+          this.horadecierre = horadecierre;
           this.descripcion = descripcion;
           this.preciobase = preciobase;
           this.imagen = imagen;
@@ -137,7 +139,7 @@ router.post("/getAuctions", authorization, async (req, res) => {
       while ((row = await resultSet.getRow())) {
         //console.log(row)
         procedure.rows.push(
-          new rowa(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+          new rowa(row[0], row[1], row[2], row[3], row[4], row[5], row[6],row[7])
         );
       }
       await resultSet.close(); //Cierre de conexion y result set
@@ -158,13 +160,42 @@ router.post("/getAuctions", authorization, async (req, res) => {
 // Método para traer las categorías
 router.post("/getCategories", authorization, async (req, res) => {
   database = req.database;
-  const client = await pool.connect();
-  console.log("Getting categories");
+  let client
+  let procedure
+  if(database === "pg")
+    client = await pool.connect();
+  else
+    client = await oracledb.getConnection()
+    console.log("Getting categories");
   try {
     const queryText = "SELECT * FROM obtener_categorias()";
-    const procedure = await client.query(queryText);
+    const oracleQuery = "BEGIN  casa_subastas.obtener_categorias(:ret);  END;";
+    if(database === "pg")
+      procedure = await client.query(queryText);
+    else{
+      oracleProcedure = await client.execute(oracleQuery,{ret:{type:oracledb.CURSOR,dir:oracledb.BIND_OUT}});
+      class rowa {
+        constructor(
+          id,
+          nombre,
+        ) {
+          this.id = id;
+          this.nombre = nombre;
+        }
+      }
+      const resultSet = oracleProcedure.outBinds.ret;
+      procedure = { rows: [] };
+      let row;
+      while ((row = await resultSet.getRow())) {
+        console.log(row)
+        procedure.rows.push(
+          new rowa(row[0], row[1])
+        );
+      }
+      await resultSet.close(); //Cierre de conexion y result set
+    }
     res.json(procedure.rows);
-    console.log(procedure.rows);
+    console.log("xd"+procedure);
   } catch (err) {
     console.error("ERORR GETTING THE CATEGORIES", err.message);
     res.status(500).send("Error en el servidor");
@@ -180,13 +211,44 @@ router.post("/getCategories", authorization, async (req, res) => {
 // Método para traer las subcategorías
 router.post("/getSubcategories", authorization, async (req, res) => {
   database = req.database;
-  const client = await pool.connect();
+  let client
+  let procedure
+  if(database === "pg")
+    client = await pool.connect();
+  else
+    client = await oracledb.getConnection();
   console.log("Getting subcategories");
   try {
     const queryText = "SELECT * FROM obtener_subcategorias()";
-    const procedure = await client.query(queryText);
+    const oracleQuery = "BEGIN  casa_subastas.obtener_subcategorias (:ret);  END;";
+    if(database === "pg")
+      procedure = await client.query(queryText);
+    else{
+      oracleProcedure = await client.execute(oracleQuery,{ret:{type:oracledb.CURSOR,dir:oracledb.BIND_OUT}})
+      class rowa {
+        constructor(
+          id,
+          nombre,
+          idcategoria
+        ) {
+          this.id = id;
+          this.nombre = nombre;
+          this.idcategoria = idcategoria;
+        }
+      }
+      const resultSet = oracleProcedure.outBinds.ret;
+      procedure = { rows: [] };
+      let row;
+      while ((row = await resultSet.getRow())) {
+        console.log(row)
+        procedure.rows.push(
+          new rowa(row[0], row[2],row[1])
+        );
+        //console.log(procedure)
+      }
+      await resultSet.close(); //Cierre de conexion y result set
+    }
     res.json(procedure.rows);
-    console.log(procedure.rows);
   } catch (err) {
     console.error("ERORR GETTING THE SUBCATEGORIES", err.message);
     res.status(500).send("Error en el servidor");
@@ -202,6 +264,8 @@ router.post("/getSubcategories", authorization, async (req, res) => {
 // Método para agregar una subasta
 router.post("/addAuction", authorization, async (req, res) => {
   database = req.database;
+  let client
+  let procedure
   // Se desestructura el body
   const {
     sellerAlias,
@@ -215,41 +279,66 @@ router.post("/addAuction", authorization, async (req, res) => {
   } = req.body;
   const datetime = date + " " + time;
   // Se hace la llamada a la base de datos
-  const client = await pool.connect();
+  if(database === "pg")
+    client = await pool.connect();
+  else
+    client = await oracledb.getConnection()
   console.log("Adding auction");
   console.log("Datos de la subasta a agregar (server):", req.body);
   try {
     const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
     const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
-    console.log(
-      "Para meter en crear item:",
-      subcategoryId,
-      basePrice,
-      description,
-      image
-    );
-    const itemId = await client.query(createItemQuery, [
-      subcategoryId,
-      basePrice,
-      description,
-      image,
-    ]);
+    const oracleItemQuery = "BEGIN  casa_subastas.crear_item (:subcategoryId,:basePrice,:description,:imagen,:ret);  END;";
+    const oracleAuctionQuery =  "BEGIN  casa_subastas.crear_subasta (:itemId,:sellerAlias,:datetime,:deliveryDetails:ret);  END;";
+    if(database === "pg"){
+      console.log(
+        "Para meter en crear item:",
+        subcategoryId,
+        basePrice,
+        description,
+        image
+      );
+      const itemId = await client.query(createItemQuery, [
+        subcategoryId,
+        basePrice,
+        description,
+        image,
+      ]);
 
-    await client.query("BEGIN");
-    console.log(
-      "Para meter en crear subastas: ",
-      itemId.rows[0].crear_item,
-      sellerAlias,
-      datetime,
-      deliveryDetails
-    );
-    await client.query(createAuctionText, [
-      itemId.rows[0].crear_item,
-      sellerAlias,
-      datetime,
-      deliveryDetails,
-    ]);
-    await client.query("END;");
+      await client.query("BEGIN");
+      console.log(
+        "Para meter en crear subastas: ",
+        itemId.rows[0].crear_item,
+        sellerAlias,
+        datetime,
+        deliveryDetails,
+        ret
+      );
+      await client.query(createAuctionText, [
+        itemId.rows[0].crear_item,
+        sellerAlias,
+        datetime,
+        deliveryDetails
+      ]);
+      await client.query("END;");
+  }
+  else{
+    const itemId = await client.execute(oracleItemQuery,{
+      subcategoryId:subcategoryId,
+      basePrice:basePrice,
+      description:description,
+      imagen:{type:oracledb.BLOB},
+      ret:{type:oracledb.NUMBER,dir:oracledb.BIND_OUT}
+    },{ autoCommit: true })
+    console.log()
+    let laDate =new Date(datetime)
+    await client.execute(oracleAuctionQuery,{
+      itemId:itemId.outBinds.ret,
+      sellerAlias:sellerAlias,
+      datetime:laDate,
+      deliveryDetails:deliveryDetails,
+    },{ autoCommit: true })
+  }
 
     res.json("Subasta agregada correctamente");
   } catch (err) {

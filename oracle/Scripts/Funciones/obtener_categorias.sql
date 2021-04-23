@@ -1,0 +1,6 @@
+CREATE OR REPLACE PROCEDURE obtener_categorias(ret OUT SYS_REFCURSOR) 
+AS
+BEGIN
+    OPEN ret FOR
+	SELECT * FROM Categorias;
+END;
