@@ -9,7 +9,7 @@ router.get("/obtenerAliasTipoUsuario", authorization, async (req, res) => {
 
     const queryText = "SELECT * FROM obtener_alias_y_tipo_usuario($1)";
     const procedure = await client.query(queryText, [req.user]);
-    console.log(procedure);
+    // console.log(procedure);
     const response = {
       cedula: req.user,
       alias: procedure.rows[0].alias,
@@ -56,13 +56,29 @@ router.post("/obtenerInfoCompletaUsuario", authorization, async (req, res) => {
 });
 
 //Metodo para traer todos los items que estan en la base de datos
-router.post("/getProducts", authorization, async (req, res) => {
+router.post("/getAuctions", authorization, async (req, res) => {
   const client = await pool.connect();
-  console.log("Getting products");
+  console.log("Getting auctions");
   try {
-    const queryText = "SELECT * FROM obtener_subastas()";
-    const procedure = await client.query(queryText);
-    res.json(procedure.rows);
+    const queryGetAuctions = "SELECT * FROM obtener_subastas()";
+    const queryGetHighestBids = "SELECT * FROM obtener_pujas_maximas()";
+
+    // Se inicia la transacción
+    await client.query("BEGIN");
+
+    const auctions = await client.query(queryGetAuctions);
+    const highestBids = await client.query(queryGetHighestBids);
+
+    await client.query("END;");
+
+    // Se prepara la información antes de devolverla al cliente
+    const auction_data = {
+      auctions: auctions.rows,
+      highestBids: highestBids.rows,
+    };
+
+    console.log(auction_data);
+    res.json(auctions.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
@@ -122,7 +138,7 @@ router.post("/addAuction", authorization, async (req, res) => {
   // Se hace la llamada a la base de datos
   const client = await pool.connect();
   console.log("Adding auction");
-  console.log("image data:", image);
+  console.log("Datos de la subasta a agregar (server):", req.body);
   try {
     const createItemQuery = "select * from crear_item($1, $2, $3, $4)";
     const createAuctionText = "call crear_subasta($1, $2, $3, $4)";
@@ -163,8 +179,7 @@ router.post("/addAuction", authorization, async (req, res) => {
   }
 });
 
-//Tiene el nombre mal, tiene que ser verPujas
-router.post("/verSubastas", authorization, async (req, res) => {
+router.post("/getBids", authorization, async (req, res) => {
   const { idsubasta } = req.body;
   const client = await pool.connect();
   console.log("Getting bids");
@@ -220,7 +235,7 @@ router.post("/verVentasUsuario", authorization, async (req, res) => {
     const { cedula } = req.body;
     console.log(req.body);
     console.log(cedula);
-    const queryText = "SELECT * FROM obtener_subastas_vendedor($1)";
+    const queryText = "SELECT * FROM obtener_ventas_por_vendedor($1)";
     const procedure = await client.query(queryText, [cedula]);
     res.json(procedure.rows);
     console.log(procedure.rows);

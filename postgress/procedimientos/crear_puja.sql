@@ -12,8 +12,9 @@ DECLARE
     maxPrice int;
 BEGIN
     maxPrice := Max(monto) from Ofertas where IdSubasta = p_id_subasta;
-    INSERT INTO Ofertas(IdSubasta,IdOfertante,monto,fechatiempo,ganadora) --Considerar que necesito retornar
-    VALUES (p_id_subasta,p_id_usuario,p_monto,CURRENT_TIMESTAMP(2),0);
+    INSERT INTO Ofertas (IdSubasta, IdOfertante, Monto, FechaTiempo, Ganadora) --Considerar que necesito retornar
+    VALUES (p_id_subasta,p_id_usuario,p_monto,CURRENT_TIMESTAMP(2),p_estado);
+
 END;
 $$ LANGUAGE plpgsql
  SECURITY DEFINER

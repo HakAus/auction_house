@@ -70,52 +70,48 @@ const CreateAuctionView = ({ sellerAlias }) => {
     e.preventDefault();
 
     // Se agrupan los valores recopilados del form
-    // const body = {
-    //   sellerAlias,
-    //   subcategoryId,
-    //   description,
-    //   basePrice,
-    //   date,
-    //   time,
-    //   // image,
-    //   deliveryDetails,
-    // };
-    const formData = new FormData();
-    formData.append("sellerAlias", sellerAlias);
-    formData.append("subcategoryId", subcategoryId);
-    formData.append("description", description);
-    formData.append("basePrice", basePrice);
-    formData.append("date", date);
-    formData.append("time", time);
-    formData.append("image", image);
-    formData.append("deliveryDetails", deliveryDetails);
-
+    const body = {
+      sellerAlias,
+      subcategoryId,
+      description,
+      basePrice,
+      date,
+      time,
+      image,
+      deliveryDetails,
+    };
+    console.log("Datos para mandar al server (cliente):", body);
     // Validar
     if (
-      // ![
-      //   sellerAlias,
-      //   subcategoryId,
-      //   description,
-      //   basePrice,
-      //   date,
-      //   time,
-      //   image,
-      //   deliveryDetails,
-      // ].every(Boolean)
-      true
+      sellerAlias !== "" &&
+      subcategoryId !== -1 &&
+      description !== "" &&
+      basePrice !== 0 &&
+      date !== "" &&
+      time !== "" &&
+      deliveryDetails !== ""
     ) {
       // Mandar
-      const response = await fetch(
-        "http://localhost:5000/dashboard/addAuction",
-        {
-          method: "POST",
-          headers: {
-            token: localStorage.token,
-            "Content-Type": "multipart/form-data",
-          },
-          body: formData,
-        }
-      );
+      try {
+        const response = await fetch(
+          "http://localhost:5000/dashboard/addAuction",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              token: localStorage.token,
+            },
+            body: JSON.stringify(body),
+          }
+        );
+
+        const parseResponse = await response.json();
+
+        console.log(parseResponse);
+      } catch (err) {
+        console.error(err.message);
+        alert("Hubo un error en el servidor");
+      }
     } else {
       alert("Debe llenar todos los campos");
     }

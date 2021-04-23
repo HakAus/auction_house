@@ -22,7 +22,7 @@ const Dashboard = ({ setAuth }) => {
 
   const getAuctData = (e, Subasta) => {
     setSubasta(Subasta);
-    setView("auct_history");
+    setView("auct_history"); // historial de pujas
   };
 
   const setAuctList = (e, fetchedId, modo) => {

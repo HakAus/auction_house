@@ -33,7 +33,7 @@ const UserListView = ({ setAuctList }) => {
   return (
     <div style={{ width: "80%", margin: "3rem auto" }}>
       <div style={{ textAlign: "center" }}>
-        <h1>History</h1>
+        <h1>Usuarios</h1>
       </div>
       <br />
       <div
@@ -43,9 +43,9 @@ const UserListView = ({ setAuctList }) => {
           margin: "1rem auto",
         }}
       >
-        <SearchFeature refreshFunction={updateSearchTerms} />
+        {/* <SearchFeature refreshFunction={updateSearchTerms} /> */}
       </div>
-      <table class="table mt-5 text-center">
+      <table class="table text-center">
         <thead>
           <tr>
             <th>Id Usuario</th>

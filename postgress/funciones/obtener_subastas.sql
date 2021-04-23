@@ -1,9 +1,10 @@
-create or replace function obtener_subastas() returnS table(idSubasta int,horaDeCierre timestamp,idItem int,preciobase numeric(9,2),descripcion text,imagen bytea)
+create or replace function obtener_subastas() returnS table(idSubasta int,aliasVendedor VARCHAR, horaDeCierre timestamp,idItem int,preciobase numeric(9,2),descripcion text,imagen bytea)
 language plpgsql
 as $$
 begin
 return query
-	SELECT S.idSubasta,S.fechaHoraCierre,I.idItem,I.precioBase,I.descripcion,I.imagen FROM Subastas S
+	SELECT S.idSubasta, U.Alias, S.fechaHoraCierre,I.idItem,I.precioBase,I.descripcion,I.imagen FROM Subastas S
+    INNER JOIN Usuarios U ON U.Cedula = S.IdVendedor
 	INNER JOIN Items I ON I.idItem = iditemsubastado;
 end; $$
  SECURITY DEFINER

@@ -4,14 +4,14 @@ LANGUAGE plpgsql
 AS
 $$
 BEGIN
-    RETURN query
-    SELECT S.idSubasta, S.FechaHoraCierre, I.Descripcion
-    FROM Ventas V
-    INNER JOIN Usuario U ON U.Cedula = p_id_comprador
-    INNER JOIN Subasta S  ON S.IdSubasta = V.IdSubasta
-    INNER JOIN Item I ON I.IdItem = S.IdItemSubastado
-    INNER JOIN Oferta O ON O.IdSubasta = S.IdSubasta
-    WHERE O.Ganadora = 1 AND O.IdSubasta = S.IdSubasta;
+    RETURN QUERY
+        SELECT S.IdSubasta, S.FechaHoraCierre, I.Descripcion
+        FROM Ventas V
+        INNER JOIN Usuario U ON U.Cedula = p_id_comprador
+        INNER JOIN Subasta S  ON S.IdSubasta = V.IdSubasta
+        INNER JOIN Item I ON I.IdItem = S.IdItemSubastado
+        INNER JOIN Oferta O ON O.IdSubasta = S.IdSubasta
+        WHERE O.Ganadora = 1 AND O.IdSubasta = S.IdSubasta;
 END; $$
 SECURITY DEFINER
     -- Set a secure search_path: trusted schema(s), then 'pg_temp', then pg_catalog to have user-defined names override built-in names

@@ -49,7 +49,7 @@ const ParticipanteNavBarOptions = ({ setView, logout }) => {
             class="btn btn-light mx-2"
             onClick={() => setView("create_auction_view")}
           >
-            Crear subasta
+            Agregar subasta
           </button>
         </li>
         <li class="nav-item">

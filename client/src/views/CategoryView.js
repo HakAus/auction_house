@@ -9,9 +9,9 @@ import ImageSlider from "../components/ImageSlider.js";
 
 const { Meta } = Card;
 const CategoriyView = ({ getAuctData }) => {
-  async function getProducts() {
+  async function getAuctions() {
     try {
-      return fetch("http://localhost:5000/dashboard/getProducts", {
+      return fetch("http://localhost:5000/dashboard/getAuctions", {
         method: "POST",
         headers: {
           token: localStorage.token,
@@ -23,7 +23,7 @@ const CategoriyView = ({ getAuctData }) => {
     }
   }
 
-  const [Products, setProducts] = useState([]);
+  const [Auctions, setAuctions] = useState([]);
 
   const logout = (e) => {
     // Se evita el refreso de la página.
@@ -35,9 +35,9 @@ const CategoriyView = ({ getAuctData }) => {
 
   useEffect(() => {
     let mounted = true;
-    getProducts().then((items) => {
+    getAuctions().then((items) => {
       if (mounted) {
-        setProducts(items);
+        setAuctions(items);
       }
     });
     return () => (mounted = false);
@@ -52,109 +52,110 @@ const CategoriyView = ({ getAuctData }) => {
     price: [],
   });
 
-  const onLoadMore = () => {
-    let skip = Skip + Limit;
+  // const onLoadMore = () => {
+  //   let skip = Skip + Limit;
 
-    const variables = {
-      skip: skip,
-      limit: Limit,
-      loadMore: true,
-      filters: Filters,
-      searchTerm: SearchTerms,
-    };
-    getProducts(variables);
-    setSkip(skip);
-  };
+  //   const variables = {
+  //     skip: skip,
+  //     limit: Limit,
+  //     loadMore: true,
+  //     filters: Filters,
+  //     searchTerm: SearchTerms,
+  //   };
+  //   getProducts(variables);
+  //   setSkip(skip);
+  // };
 
-  const renderCards = Products.map((product, index) => {
-    console.log(index);
-    console.log(product);
+  const renderCards = Auctions.map((auction, index) => {
+    console.log("INFO DE LA SUBASTA", auction);
     return (
       <Col lg={6} md={8} xs={24}>
         <Card
           hoverable={true}
           cover={
-            <a href={`/product/${product.iditem}`}>
+            <a href={`/product/${auction.iditem}`}>
               {" "}
-              <ImageSlider images={product.imagen} />
+              <ImageSlider images={auction.imagen} />
             </a>
           }
         >
+          <p>{`Vendedor: ${auction.aliasvendedor}`}</p>
           <Meta
-            title={product.descripcion}
-            description={`$${product.preciobase}`}
-            onClick={(e) => getAuctData(e, product)}
+            title={auction.descripcion}
+            description={
+              auction.preciobase < auction.pujamasalta
+                ? `${auction.pujamasalta}`
+                : `$${auction.preciobase}`
+            }
+            onClick={(e) => getAuctData(e, auction)}
           />
         </Card>
       </Col>
     );
   });
 
-  const showFilteredResults = (filters) => {
-    const variables = {
-      skip: 0,
-      limit: Limit,
-      filters: filters,
-    };
-    getProducts(variables);
-    setSkip(0);
-  };
+  // const showFilteredResults = (filters) => {
+  //   const variables = {
+  //     skip: 0,
+  //     limit: Limit,
+  //     filters: filters,
+  //   };
+  //   getProducts(variables);
+  //   setSkip(0);
+  // };
 
-  const handlePrice = (value) => {
-    const data = price;
-    let array = [];
+  // const handlePrice = (value) => {
+  //   const data = price;
+  //   let array = [];
 
-    for (let key in data) {
-      if (data[key]._id === parseInt(value, 10)) {
-        array = data[key].array;
-      }
-    }
-    console.log("array", array);
-    return array;
-  };
+  //   for (let key in data) {
+  //     if (data[key]._id === parseInt(value, 10)) {
+  //       array = data[key].array;
+  //     }
+  //   }
+  //   console.log("array", array);
+  //   return array;
+  // };
 
-  const handleFilters = (filters, category) => {
-    const newFilters = { ...Filters };
+  // const handleFilters = (filters, category) => {
+  //   const newFilters = { ...Filters };
 
-    newFilters[category] = filters;
+  //   newFilters[category] = filters;
 
-    if (category === "price") {
-      let priceValues = handlePrice(filters);
-      newFilters[category] = priceValues;
-    }
+  //   if (category === "price") {
+  //     let priceValues = handlePrice(filters);
+  //     newFilters[category] = priceValues;
+  //   }
 
-    console.log(newFilters);
+  //   console.log(newFilters);
 
-    showFilteredResults(newFilters);
-    setFilters(newFilters);
-  };
+  //   showFilteredResults(newFilters);
+  //   setFilters(newFilters);
+  // };
 
-  const updateSearchTerms = (newSearchTerm) => {
-    const variables = {
-      skip: 0,
-      limit: Limit,
-      filters: Filters,
-      searchTerm: newSearchTerm,
-    };
+  // const updateSearchTerms = (newSearchTerm) => {
+  //   const variables = {
+  //     skip: 0,
+  //     limit: Limit,
+  //     filters: Filters,
+  //     searchTerm: newSearchTerm,
+  //   };
 
-    setSkip(0);
-    setSearchTerms(newSearchTerm);
+  //   setSkip(0);
+  //   setSearchTerms(newSearchTerm);
 
-    getProducts(variables);
-  };
+  //   getProducts(variables);
+  // };
 
   return (
     <div style={{ width: "75%", margin: "3rem auto" }}>
       <div style={{ textAlign: "center" }}>
-        <h2>
-          {" "}
-          Vamoh a subastar! <Icon type="rocket" />{" "}
-        </h2>
+        <h2> Subastas</h2>
       </div>
 
       {/* Filter  */}
 
-      <Row gutter={[16, 16]}>
+      {/* <Row gutter={[16, 16]}>
         <Col lg={12} xs={24}>
           <CheckBox
             list={categorias}
@@ -167,10 +168,10 @@ const CategoriyView = ({ getAuctData }) => {
             handleFilters={(filters) => handleFilters(filters, "price")}
           />
         </Col>
-      </Row>
+      </Row> */}
 
       {/* Search  */}
-      <div
+      {/* <div
         style={{
           display: "flex",
           justifyContent: "flex-end",
@@ -178,8 +179,8 @@ const CategoriyView = ({ getAuctData }) => {
         }}
       >
         <SearchFeature refreshFunction={updateSearchTerms} />
-      </div>
-      {Products.length === 0 ? (
+      </div> */}
+      {Auctions.length === 0 ? (
         <div
           style={{
             display: "flex",
@@ -188,7 +189,7 @@ const CategoriyView = ({ getAuctData }) => {
             alignItems: "center",
           }}
         >
-          <h2>No post yet...</h2>
+          <h2>No hay subastas en este momento</h2>
         </div>
       ) : (
         <div>
@@ -198,15 +199,11 @@ const CategoriyView = ({ getAuctData }) => {
       <br />
       <br />
 
-      {PostSize >= Limit && (
+      {/* {PostSize >= Limit && (
         <div style={{ display: "flex", justifyContent: "center" }}>
           <button onClick={onLoadMore}>Load More</button>
         </div>
-      )}
-
-      <button className="btn btn-primary" onClick={(e) => logout(e)}>
-        Cerrar sesión
-      </button>
+      )} */}
     </div>
   );
 };

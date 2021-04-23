@@ -40,11 +40,15 @@ const UserAuctsView = ({ Usuario, Modo }) => {
   return (
     <div style={{ width: "80%", margin: "3rem auto" }}>
       <div style={{ textAlign: "center" }}>
-        <h1>History</h1>
+        {Modo === "venta" ? (
+          <h1>Historial de ventas</h1>
+        ) : (
+          <h1>Historial de compras</h1>
+        )}
       </div>
       <br />
 
-      <table class="table mt-5 text-center">
+      <table class="table text-center">
         <thead>
           <tr>
             <th>Id Subasta</th>
@@ -52,7 +56,6 @@ const UserAuctsView = ({ Usuario, Modo }) => {
             <th>Item</th>
           </tr>
         </thead>
-        {console.log(History)}
         {History.length !== 0 ? (
           <tbody>
             {History.map((item) => (
@@ -65,7 +68,14 @@ const UserAuctsView = ({ Usuario, Modo }) => {
           </tbody>
         ) : (
           <tbody>
-            ,<h2> No aucts yet...</h2>
+            <br />
+            <div style={{ textAlign: "center" }}>
+              {Modo === "venta" ? (
+                <h4> No existen ventas registradas para este usuario</h4>
+              ) : (
+                <h4> No existen compras registradas para este usuario</h4>
+              )}
+            </div>
           </tbody>
         )}
       </table>
