@@ -102,7 +102,7 @@ const Dashboard = ({ setAuth }) => {
           ) : view === "create_auction_view" && userType === "participante" ? (
             <CreateAuctionView sellerAlias={alias} />
           ) : view === "register_user_view" && userType === "administrador" ? (
-            <RegisterUserView />
+            <RegisterUserView setAuth = {setAuth}/>
           ) : view === "auct_history" && userType === "participante" ? (
             <AuctHistoryView
               Subasta={Subasta}

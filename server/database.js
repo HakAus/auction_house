@@ -70,7 +70,15 @@ const registerUser = async (
           p_estado: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
         },
         { autoCommit: true }
+        
       );
+      for (let i = 0; i < telefonos.length; i++) {
+        await client.execute("BEGIN agregar_telefono(:p_cedula,:p_telefono); END;", {
+          p_cedula:cedula,
+          p_telefono:telefonos[i],
+        },{ autoCommit: true }
+        );
+      }
     }
 
     // Se retorna el estado del procedimiento
