@@ -36,6 +36,7 @@ router.get("/obtenerAliasTipoUsuario", authorization, async (req, res) => {
           this.cedula = cedula;
         }
       }
+      
       procedure = { rows: [] };
       let row;
       while ((row = await resultSet.getRow())) {
@@ -45,6 +46,7 @@ router.get("/obtenerAliasTipoUsuario", authorization, async (req, res) => {
       // always close the ResultSet
       await resultSet.close();
     }
+    console.log(procedure)
     res.json(procedure.rows[0]);
   } catch (err) {
     console.error(err.message);
