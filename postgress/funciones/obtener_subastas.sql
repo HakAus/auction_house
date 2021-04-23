@@ -5,7 +5,8 @@ begin
 return query
 	SELECT S.idSubasta, U.Alias, S.fechaHoraCierre,I.idItem,I.precioBase,I.descripcion,I.imagen FROM Subastas S
     INNER JOIN Usuarios U ON U.Cedula = S.IdVendedor
-	INNER JOIN Items I ON I.idItem = iditemsubastado;
+	INNER JOIN Items I ON I.idItem = iditemsubastado
+    ORDER BY S.fechaHoraCierre;
 end; $$
  SECURITY DEFINER
     -- Set a secure search_path: trusted schema(s), then 'pg_temp', then pg_catalog to have user-defined names override built-in names

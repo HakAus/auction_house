@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Descriptions, Badge } from "antd";
 
 // Aqui tan las pujas
 const AuctHistoryView = ({ Subasta }) => {
@@ -7,7 +8,8 @@ const AuctHistoryView = ({ Subasta }) => {
   });
   const { monto } = inputs;
   const idsubasta = Subasta.idsubasta;
-
+  const [fechaSubasta, setFechaSubasta] = useState("");
+  const [horaSubasta, setHoraSubasta] = useState("");
   const [History, setHistory] = useState([]);
 
   const getHistory = async () => {
@@ -29,7 +31,7 @@ const AuctHistoryView = ({ Subasta }) => {
   async function getHigherBid() {}
 
   const onClick = async (e) => {
-    if (monto < 5000) console.log("Oferta minima 5000");
+    if (monto < 5000) alert("Oferta minima 5000");
     else {
       bid();
     }
@@ -57,6 +59,9 @@ const AuctHistoryView = ({ Subasta }) => {
 
   useEffect(() => {
     let mounted = true;
+    const fechaHora = Subasta.horadecierre.split("T");
+    setFechaSubasta(fechaHora[0]);
+    setHoraSubasta(fechaHora[1].slice(0, -5)); // terror
     getHistory().then((items) => {
       if (mounted) {
         setHistory(items);
@@ -67,10 +72,34 @@ const AuctHistoryView = ({ Subasta }) => {
 
   return (
     <div style={{ width: "80%", margin: "3rem auto" }}>
-      <div style={{ textAlign: "center" }}>
-        <h1>Historial de pujas</h1>
-      </div>
+      {console.log(Subasta)}
+      <Descriptions title="Información de la subasta" bordered column={2}>
+        <Descriptions.Item label="Alias del vendedor">
+          {Subasta.aliasvendedor}
+        </Descriptions.Item>
+        <Descriptions.Item label="Precio base">
+          {`₡${Subasta.preciobase}`}
+        </Descriptions.Item>
+        <Descriptions.Item label="Fecha de cierre">
+          {fechaSubasta}
+        </Descriptions.Item>
+        <Descriptions.Item label="Hora de cierre">
+          {horaSubasta}
+        </Descriptions.Item>
+        <Descriptions.Item label="Descripción" span={2}>
+          {Subasta.descripcion}
+        </Descriptions.Item>
+        <Descriptions.Item label="Imagen" span={2}>
+          No hay :(
+        </Descriptions.Item>
+        <Descriptions.Item label="Estado" span={3}>
+          <Badge status="processing" text="Activa" />
+        </Descriptions.Item>
+      </Descriptions>
       <br />
+      <div style={{ textAlign: "center" }}>
+        <h4>Historial de pujas</h4>
+      </div>
       <input
         type="number"
         name="monto"

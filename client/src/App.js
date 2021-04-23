@@ -79,7 +79,7 @@ function App() {
                   !isAuthenticated ? (
                     <Register {...props} setAuth={setAuth} />
                   ) : (
-                    <Redirect to="/login" />
+                    <Redirect to="/selectDatabase" />
                   )
                 }
               ></Route>
@@ -90,7 +90,7 @@ function App() {
                   isAuthenticated ? (
                     <Dashboard {...props} setAuth={setAuth} />
                   ) : (
-                    <Redirect to="/login" />
+                    <Redirect to="/selectDatabase" />
                   )
                 }
               ></Route>

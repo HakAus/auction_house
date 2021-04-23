@@ -335,4 +335,51 @@ router.post("/actualizarUsuario", authorization, async (req, res) => {
   }
 });
 
+// Para obtener los parámetros del sisetma
+router.get("/getSystemParameters", authorization, async (req, res) => {
+  const client = await pool.connect();
+  console.log("Trayendo parámetros del sistema");
+  const queryGetSystemParameters = "SELECT * FROM obtener_parametros_sistema()";
+  try {
+    // Inicio de la transacción
+    await client.query("BEGIN");
+
+    const systemParameters = await client.query(queryGetSystemParameters);
+
+    res.json(systemParameters.rows[0]);
+
+    await client.query("END;");
+  } catch (err) {
+    console.error(err.message);
+  } finally {
+    client.release();
+  }
+});
+
+// Para obtener los parámetros del sisetma
+router.post("/updateSystemParameters", authorization, async (req, res) => {
+  const client = await pool.connect();
+
+  console.log(req.body);
+  const { mejora, incrementoMinimo } = req.body;
+
+  console.log(mejora, incrementoMinimo);
+
+  const queryGetSystemParameters = "CALL actualizar_parametros_sistema($1, $2)";
+  try {
+    // Inicio de la transacción
+    await client.query("BEGIN");
+
+    await client.query(queryGetSystemParameters, [mejora, incrementoMinimo]);
+
+    res.json("Actualización exitosa");
+
+    await client.query("END;");
+  } catch (err) {
+    console.error(err.message);
+  } finally {
+    client.release();
+  }
+});
+
 module.exports = router;

@@ -176,16 +176,4 @@ router.get("/is-verified", authorization, async (req, res) => {
   }
 });
 
-// Seleccionar la base de datos
-// router.get("/selectDatabase", async (req, res) => {
-//   try {
-//     console.log("LA BASE ES: ", req.database);
-//     database = req.database;
-//     res.json(`${database} was selected`);
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send("Error en el servidor");
-//   }
-// });
-
 module.exports = router;

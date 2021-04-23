@@ -20,6 +20,15 @@ const AdminNavBarOptions = ({ setView, logout }) => {
             Actualizar usuario
           </button>
         </li>
+        <li class="nav-item">
+          <button
+            type="button"
+            class="btn btn-light mx-2"
+            onClick={() => setView("system_parameters_view")}
+          >
+            Actualizar parámetros del sistema
+          </button>
+        </li>
         <li>
           <button className="btn btn-primary mx-2" onClick={(e) => logout(e)}>
             Cerrar sesión

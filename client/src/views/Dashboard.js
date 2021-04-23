@@ -10,6 +10,7 @@ import UserListView from "./UserListView";
 import UserAuctsView from "./UserAuctsView";
 import UpdateUserView from "./UpdateUserView";
 import UpdateUserListView from "./UpdateUserListView";
+import SetSystemParametersView from "./SetSystemParametersView";
 
 const Dashboard = ({ setAuth }) => {
   const [alias, setAlias] = useState("");
@@ -105,6 +106,9 @@ const Dashboard = ({ setAuth }) => {
               user={Usuario}
               returnToUserUpdateList={returnToUserUpdateList}
             />
+          ) : view === "system_parameters_view" &&
+            userType == "administrador" ? (
+            <SetSystemParametersView />
           ) : (
             <div></div>
           )}
