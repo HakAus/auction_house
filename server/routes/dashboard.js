@@ -7,7 +7,6 @@ const OracleDB = require("oracledb");
 router.get("/", authorization, async (req, res) => {
   let client
   database = "oracle"
-
   try {
     if(database === "pg")
     client = await pool.connect();
@@ -70,13 +69,14 @@ router.post("/getProducts",authorization, async (req, res) => {
       procedure.rows.push(new rowa(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
     }
     await resultSet.close();//Cierre de conexion y result set
-    client.close();
+    
     }
     res.json(procedure.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   }
+  client.close();
 });
 
 // Método para traer las categorías
@@ -197,13 +197,14 @@ router.post("/verSubastas", authorization, async (req, res) => {
         procedure.rows.push(new rowa(row[0],row[1],row[2],row[3]))
       }
       await resultSet.close();
-      client.close()
+      
     }
     res.json(procedure.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   }
+  client.close()
 });
 
 //Este metodo es para ofertar en una subasta
@@ -235,42 +236,82 @@ router.post("/ofertar",authorization, async (req, res) => {//No puedo sacar la a
 
 //Este es para ver los usuarios
 router.post("/verVentasUsuario", authorization, async (req, res) => {
-  const client = await pool.connect();
+  let client
+  let procedure
+  if(database === "pg")
+    client = await pool.connect();
+  else
+    client = await oracledb.getConnection();
   console.log("Getting seller aucts");
   try {
     const { cedula } = req.body;
-    console.log(req.body)
-    console.log(cedula)
+    const oracleQuery = 'BEGIN  casa_subastas.obtener_subastas_vendedor(:pcedula,:ret);  END;';
     const queryText = "SELECT * FROM obtener_subastas_vendedor($1)";
-    const procedure = await client.query(queryText, [cedula]);
+    if(database === "pg")
+      procedure = await client.query(queryText, [cedula]);
+    else{
+      let oracleProcedure = await client.execute(oracleQuery,{pcedula:cedula,ret:{type:oracledb.CURSOR, dir:oracledb.BIND_OUT}})
+      class rowa{constructor(idsubasta,fechahoracierre,descripcionitem){this.idsubasta = idsubasta;this.fechahoracierre = fechahoracierre;this.descripcionitem = descripcionitem}}
+      const resultSet = oracleProcedure.outBinds.ret
+      procedure = {rows:[]}
+      let row;
+      while ((row = await resultSet.getRow())) {
+        procedure.rows.push(new rowa(row[0],row[1],row[2]))
+      }
+
+      // always close the ResultSet
+      await resultSet.close();
+    }
     res.json(procedure.rows);
     console.log(procedure.rows)
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   }
+  client.close();
 });
 
 router.post("/verComprasUsuario", authorization, async (req, res) => {
-  const client = await pool.connect();
+  let client
+  let procedure
+  database = "oracle"
+  if(database === "pg")
+    client = await pool.connect();
+  else
+    client = await oracledb.getConnection()
   console.log("Getting buyer aucts");
   try {
     const { cedula } = req.body;
     const queryText = "SELECT * FROM obtener_ventas_por_comprador($1)";
-    const procedure = await client.query(queryText, [cedula]);
+    const oracleQuery = 'BEGIN  casa_subastas.obtener_ventas_por_comprador(:pcedula,:ret);  END;';
+    if(database == "pg")
+      procedure = await client.query(queryText, [cedula]);
+    else{
+      let oracleProcedure = await client.execute(oracleQuery,{pcedula:cedula,ret:{type:oracledb.CURSOR, dir:oracledb.BIND_OUT}})
+      class rowa{constructor(idsubasta,fechahoracierre,descripcionitem){this.idsubasta = idsubasta;this.fechahoracierre = fechahoracierre;this.descripcionitem = descripcionitem}}
+      const resultSet = oracleProcedure.outBinds.ret
+      procedure = {rows:[]}
+      let row;
+      while ((row = await resultSet.getRow())) {
+        procedure.rows.push(new rowa(row[0],row[1],row[2]))
+      }
+
+      // always close the ResultSet
+      await resultSet.close();
+    }
     res.json(procedure.rows);
     console.log(procedure.rows)
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   }
+  client.close()//TODO:Supongo que debe de hacerse un if para cerrar uno o el otro
 });
 
 router.post("/listaUsuarios", authorization, async (req, res) => {
   let client;
   let procedure;
   database = "oracle"
-  console.log("xdd")
   console.log("Getting users");
   try {
     if(database === "pg")
@@ -301,6 +342,7 @@ router.post("/listaUsuarios", authorization, async (req, res) => {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   }
+  client.close()
 });
 
 module.exports = router;
