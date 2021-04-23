@@ -270,19 +270,30 @@ router.post("/listaUsuarios", authorization, async (req, res) => {
   let client;
   let procedure;
   database = "oracle"
+  console.log("xdd")
   console.log("Getting users");
   try {
-    if(database = "pg")
+    if(database === "pg")
       client = await pool.connect();
     else
       client = await oracledb.getConnection();
     const queryText = "SELECT * FROM obtener_usuarios()"; //Todo:Definir el procedimiento almacenado
     const oracleQuery = 'BEGIN  casa_subastas.obtener_usuarios(:ret);  END;';
-    if(database = "pg")
+    if(database ==="pg")
        procedure = await client.query(queryText);
     else{
       let oracleProcedure = await client.execute(oracleQuery,{ret:{type:oracledb.CURSOR, dir:oracledb.BIND_OUT}})
-      
+      const resultSet = oracleProcedure.outBinds.ret;
+      class rowa{constructor(cedula,alias,correo,tipo){this.cedula = cedula;this.alias = alias,this.correo = correo,this.tipo = tipo}}
+      procedure = {rows:[]}
+      let row;
+      while ((row = await resultSet.getRow())) {
+        console.log(row)
+        procedure.rows.push(new rowa(row[0],row[1],row[2],row[3]))
+      }
+
+      // always close the ResultSet
+      await resultSet.close();
     }
     res.json(procedure.rows);
     console.log(procedure.rows);
