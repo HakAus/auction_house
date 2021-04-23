@@ -52,6 +52,8 @@ const Dashboard = ({ setAuth }) => {
       );
 
       const parseResponse = await response.json();
+      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      console.log(parseResponse);
       setAlias(parseResponse.alias);
       setUserId(parseResponse.cedula);
       setUserType(parseResponse.tipousuario);

@@ -91,6 +91,12 @@ router.post("/register", validInfo, async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
+  } finally {
+    if (database === process.env.POSTGRES) {
+      client.release();
+    } else {
+      client.close();
+    }
   }
 });
 
@@ -104,6 +110,7 @@ router.post("/login", validInfo, async (req, res) => {
 
   // Se selecciona la base de datos
   database = db;
+  console.log("CONECTANDO A ", database);
   try {
     if (database === process.env.POSTGRES) {
       client = await pg_pool.connect();
@@ -125,14 +132,13 @@ router.post("/login", validInfo, async (req, res) => {
         tipo_usuario,
       ]);
     } else {
-      const oracleProcedure = await client.execute(oracleQuery, {
+      let oracleProcedure = await client.execute(oracleQuery, {
         p_alias: alias,
         p_contrasena: contrasena,
         p_tipo_usuario: tipo_usuario,
         ret: { type: oracledb.CURSOR, dir: oracledb.BIND_OUT },
       });
       const resultSet = oracleProcedure.outBinds.ret;
-      console.log(resultSet);
       //Clase para que coincida con postgres
       class rowa {
         constructor(_cedula, _estado) {
@@ -154,7 +160,7 @@ router.post("/login", validInfo, async (req, res) => {
       loginErrorHandler(procedure.rows[0]._estado, res);
     } else {
       // 3. Generar el token
-      const token = jwtGenerator(procedure.rows[0]._cedula);
+      const token = jwtGenerator(procedure.rows[0]._cedula, database);
       // Se envía el token como respuesta en formato JSON
       res.json({ token });
     }
@@ -162,7 +168,11 @@ router.post("/login", validInfo, async (req, res) => {
     console.error(err.message);
     res.status(500).send("Error en el servidor");
   } finally {
-    client.release();
+    if (database === process.env.POSTGRES) {
+      client.release();
+    } else {
+      client.close();
+    }
   }
 });
 

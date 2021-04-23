@@ -15,7 +15,6 @@ const Login = ({ db, setAuth }) => {
   };
 
   const onSubmitForm = async (e) => {
-    console.log("ESTA ES LA BASE MAE:", db);
     e.preventDefault(); // Evita que se refresque la página, que es el comportamiento por defecto.
     try {
       const body = {
@@ -31,8 +30,9 @@ const Login = ({ db, setAuth }) => {
       });
 
       const parseResponse = await response.json();
+      console.log(parseResponse);
 
-      // Se guarda el token del usuario
+      // Se guarda el token del usuario y db
       localStorage.setItem("token", parseResponse.token);
       // Se valida el acceso
       setAuth(true);

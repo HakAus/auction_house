@@ -1,11 +1,9 @@
-CREATE OR REPLACE FUNCTION obtener_info_usuario(pCedula INT)
-RETURN SYS_REFCURSOR AS
-info_usuario SYS_REFCURSOR;
+CREATE OR REPLACE PROCEDURE obtener_info_usuario(pCedula INT, ret OUT SYS_REFCURSOR)
+AS
 BEGIN
-    OPEN info_usuario FOR
-    SELECT U.nickNake, TU.Nombre
-    FROM Usuarios I
-    INNER JOIN Tipos TU ON TU.IdTipo = U.IdTipo
+    OPEN ret FOR
+    SELECT U.alias, TU.Nombre 
+    FROM Usuarios U
+    INNER JOIN TiposUsuarios TU ON TU.IdTipo = U.IdTipo
     WHERE U.Cedula = pCedula;
-    RETURN info_usuarios;
 END;
