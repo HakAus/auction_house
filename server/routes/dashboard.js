@@ -3,6 +3,7 @@ const oracledb = require("oracledb");
 const pool = require("../pg_database");
 const authorization = require("../middleware/authorization");
 const OracleDB = require("oracledb");
+const { BIND_OUT } = require("oracledb");
 
 let database;
 
@@ -64,24 +65,65 @@ router.post("/obtenerInfoCompletaUsuario", authorization, async (req, res) => {
   database = req.database;
   // Arreglo para almacenar los telefonos del usuario
   let phoneNumbers = [];
-
-  const client = await pool.connect();
+  let client
+  let user_info
+  let user_phone_numbers
   try {
     // Del middleware "authorization" obtenemos el id del usuario validado (la cedula)
-    await client.query("BEGIN");
+
 
     const queryGetUserData = "SELECT * FROM obtener_info_completa_usuario($1)";
     const queryGetUserPhoneNumbers =
       "SELECT * FROM obtener_telefonos_usuario($1)";
-    const user_info = await client.query(queryGetUserData, [req.body.cedula]);
-    const user_phone_numbers = await client.query(queryGetUserPhoneNumbers, [
-      req.body.cedula,
-    ]);
-    for (let i = 0; i < user_phone_numbers.rows.length; i++) {
-      phoneNumbers.push(user_phone_numbers.rows[i].telefono);
+    const oracleGetUserQuery = "BEGIN  casa_subastas.obtener_info_completa_usuario(:pcedula,:ret);  END;"
+    const oracleGetUserPhonesQuery = "BEGIN  casa_subastas.obtener_telefonos_usuario(:pcedula,:ret);  END;"
+    if(database === "pg")
+    { 
+      client = await pool.connect();
+        await client.query("BEGIN");
+       user_info = await client.query(queryGetUserData, [req.body.cedula]);
+       user_phone_numbers = await client.query(queryGetUserPhoneNumbers, [
+        req.body.cedula,
+      ]);
+      for (let i = 0; i < user_phone_numbers.rows.length; i++) {
+        phoneNumbers.push(user_phone_numbers.rows[i].telefono);
+      }
+      user_info.rows[0].telefonos = phoneNumbers;
+      await client.query("END;");
     }
-    user_info.rows[0].telefonos = phoneNumbers;
-    await client.query("END;");
+    else{
+      client = await oracledb.getConnection()
+      user_info = await client.execute(oracleGetUserQuery,{pcedula:req.body.cedula,ret:{type:oracledb.CURSOR,dir:oracledb.BIND_OUT}})
+      user_phone_numbers = await client.execute(oracleGetUserPhonesQuery,{pcedula:req.body.cedula,ret:{type:oracledb.CURSOR,dir:BIND_OUT}})
+      let resultSet = user_phone_numbers.outBinds.ret;
+      class rowa {
+        constructor(alias, nombre, contrasena,primerapellido,segundoapellido,direccion,correo,telefonos) {
+          this.alias = alias,this.nombre = nombre, this.contrasena = contrasena, this.primerapellido = primerapellido,this.segundoapellido = segundoapellido;
+          this.direccion = direccion,this.correo = correo,this.telefonos = telefonos;
+        }
+      }
+      console.log("one")
+      user_phone_numbers = { rows: [] };
+      
+      let row;
+      while ((row = await resultSet.getRow())) {
+        user_phone_numbers.rows.push(row);
+      }
+      console.log("two")
+      //Crear usuario
+      resultSet = user_info.outBinds.ret;
+      user_info = {rows :[]}
+      while ((row = await resultSet.getRow())) {
+        user_info.rows.push(new rowa(row[0],row[1],row[2],row[3],row,[4],row[5],row[6],row[7]));
+      }
+
+      // always close the ResultSet
+      await resultSet.close();
+      for (let i = 0; i < user_phone_numbers.rows.length; i++) {
+        phoneNumbers.push(user_phone_numbers.rows[i].telefono);
+      }
+      user_info.rows[0].telefonos = phoneNumbers;
+    }
     res.json(user_info.rows[0]);
   } catch (err) {
     console.error(err.message);
@@ -560,9 +602,9 @@ router.post("/listaUsuarios", authorization, async (req, res) => {
       });
       const resultSet = oracleProcedure.outBinds.ret;
       class rowa {
-        constructor(cedula, alias, correo, tipo) {
+        constructor(cedula, alias, correo, tipousuario) {
           this.cedula = cedula;
-          (this.alias = alias), (this.correo = correo), (this.tipo = tipo);
+          (this.alias = alias), (this.correo = correo), (this.tipousuario = tipousuario);
         }
       }
       procedure = { rows: [] };
