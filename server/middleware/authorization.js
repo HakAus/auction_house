@@ -12,6 +12,7 @@ module.exports = async (req, res, next) => {
     const payload = jwt.verify(jwtToken, process.env.jwtSecret);
 
     req.user = payload.user;
+    req.database = payload.database;
   } catch (err) {
     console.error("Error message:", err.message);
     return res.status(403).json("No autorizado");

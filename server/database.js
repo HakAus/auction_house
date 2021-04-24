@@ -15,6 +15,7 @@ const registerUser = async (
   segundo_apellido,
   direccion,
   correo,
+  telefonos,
   estado
 ) => {
   // Sentencias de las bases de datos.
@@ -28,10 +29,11 @@ const registerUser = async (
   let client;
 
   // Ejecución de la consulta.
-  if (database === "pg") client = await pg_pool.connect();
+  if (database === process.env.POSTGRES) client = await pg_pool.connect();
   else client = await oracledb.getConnection();
   try {
-    if (database === "pg") {
+    if (database === process.env.POSTGRES) {
+      await client.query("BEGIN");
       result = await client.query(pgQuery, [
         cedula,
         tipo_usuario,
@@ -44,7 +46,15 @@ const registerUser = async (
         correo,
         estado,
       ]);
+      for (let i = 0; i < telefonos.length; i++) {
+        await client.query("call agregar_telefono($1,$2)", [
+          cedula,
+          telefonos[i],
+        ]);
+      }
+      await client.query("END;");
     } else {
+      // AGREGAR TELEFONOS EN ORACLE
       result = await client.execute(
         oracleQuery,
         {
@@ -60,18 +70,26 @@ const registerUser = async (
           p_estado: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
         },
         { autoCommit: true }
+        
       );
+      for (let i = 0; i < telefonos.length; i++) {
+        await client.execute("BEGIN agregar_telefono(:p_cedula,:p_telefono); END;", {
+          p_cedula:cedula,
+          p_telefono:telefonos[i],
+        },{ autoCommit: true }
+        );
+      }
     }
-    // console.log(result);
+
     // Se retorna el estado del procedimiento
-    return database === "pg"
+    return database === process.env.POSTGRES
       ? result.rows[0].p_estado
       : result.outBinds.p_estado;
   } catch (err) {
     console.error(err.message);
   } finally {
     // Se libera el cliente del pool respectivo
-    if (database === "pg") {
+    if (database === process.env.POSTGRES) {
       client.release();
     } else {
       client.close();

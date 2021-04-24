@@ -81,6 +81,17 @@ CREATE TABLE casa_subastas.ComentarioComprador(
     Calificacion NUMBER(1) NOT NULL
 );
 
+CREATE TABLE Telefonos
+(
+    IdTelefono INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IdUsuario INT NOT NULL,
+    Telefono INT NOT NULL,
+
+    CONSTRAINT FK_Usuarios_Telefonos
+    FOREIGN KEY (IdUsuario)
+    REFERENCES Usuarios(Cedula)
+);
+
 -- Eliminar tablas
 
 DROP TABLE casa_subastas.ComentarioComprador;
@@ -106,7 +117,6 @@ GRANT create any trigger TO casa_subastas;
 GRANT create any procedure TO casa_subastas;
 GRANT create sequence TO casa_subastas;
 GRANT create synonym TO casa_subastas;
-GRANT insert table to casa_subastas;
 
 
 

@@ -12,5 +12,5 @@ CREATE TABLE Subastas
 
     CONSTRAINT FK_Usuarios_Subastas
     FOREIGN KEY (IdVendedor)
-    REFERENCES AppUser(IdNumber)
+    REFERENCES Usuarios(Cedula)
 );

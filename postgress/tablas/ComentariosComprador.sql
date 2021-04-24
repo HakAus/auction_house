@@ -8,8 +8,5 @@ CREATE TABLE ComentariosComprador
 
     CONSTRAINT FK_ComentariosComprador_Ventas
     FOREIGN KEY (IdVenta)
-    REFERENCES Ventas(IdVenta),
-
-    CONSTRAINT C_Formato_Calificacion_Valido
-    CHECK (Calificacion ~ '^\d$')
+    REFERENCES Ventas(IdVenta)
 );
